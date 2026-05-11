@@ -1,0 +1,2207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Legal Workflow — Emily</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=DM+Mono:wght@300;400;500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ── TOKENS ─────────────────────────────────────────── */
+:root {
+  /* Muted postal palette */
+  --cream:       #f2ede4;
+  --cream-mid:   #ebe4d8;
+  --cream-deep:  #e0d8ca;
+  --stone:       #c8bfb0;
+  --stone-dark:  #9e9384;
+  --ink:         #2c2820;
+  --ink-mid:     #5a5248;
+  --ink-faint:   #9e9384;
+  --parchment:   #f8f4ee;
+  --sidebar:     #23201c;
+  --sidebar-mid: #2e2b25;
+
+  /* Practice-area accent palette — dusty, postal */
+  --sage:        #5a7a5e;   /* Commercial */
+  --sage-pale:   #e8efe9;
+  --sage-mid:    #d0dfd2;
+  --slate:       #4a5f7a;   /* Corporate */
+  --slate-pale:  #e5eaf2;
+  --slate-mid:   #c8d4e6;
+  --terracotta:  #8b5e45;   /* Conveyancing */
+  --terra-pale:  #f0e8e1;
+  --terra-mid:   #dfc8b8;
+  --dusty-rose:  #8b4a52;   /* Litigation */
+  --rose-pale:   #f0e5e6;
+  --rose-mid:    #dfbec1;
+  --mauve:       #6b5070;   /* Career */
+  --mauve-pale:  #ede6f0;
+  --mauve-mid:   #d4c4da;
+  --teal:        #3d6e6e;   /* Research */
+  --teal-pale:   #e2eeed;
+
+  /* Layout */
+  --nav-w: 248px;
+  --rad-sm: 4px;
+  --rad:    8px;
+  --rad-lg: 14px;
+  --shadow-sm: 0 1px 3px rgba(44,40,32,0.06), 0 1px 2px rgba(44,40,32,0.04);
+  --shadow:    0 2px 8px rgba(44,40,32,0.08), 0 1px 3px rgba(44,40,32,0.05);
+  --shadow-lg: 0 6px 24px rgba(44,40,32,0.10), 0 2px 8px rgba(44,40,32,0.06);
+  --border:    rgba(44,40,32,0.10);
+  --border-md: rgba(44,40,32,0.18);
+}
+
+/* ── RESET ───────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Jost', sans-serif;
+  background: var(--cream);
+  color: var(--ink);
+  min-height: 100vh;
+  font-size: 14.5px;
+  line-height: 1.65;
+  /* subtle paper grain */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+}
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; }
+
+/* ── SHELL ───────────────────────────────────────────── */
+.shell { display: flex; min-height: 100vh; }
+
+/* ── SIDEBAR ─────────────────────────────────────────── */
+.sidebar {
+  width: var(--nav-w);
+  min-width: var(--nav-w);
+  background: var(--sidebar);
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  /* subtle grain on sidebar too */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E"), linear-gradient(180deg, var(--sidebar) 0%, var(--sidebar-mid) 100%);
+}
+.sidebar::-webkit-scrollbar { width: 3px; }
+.sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 2px; }
+
+.nav-brand {
+  padding: 28px 20px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+.nav-brand .wordmark {
+  font-family: 'Playfair Display', serif;
+  font-size: 15px;
+  color: var(--parchment);
+  letter-spacing: 0.01em;
+  line-height: 1.3;
+}
+.nav-brand .sub {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  color: rgba(242,237,228,0.32);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+.nav-section { padding: 16px 12px 4px; }
+.nav-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 8.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(242,237,228,0.24);
+  padding: 0 7px;
+  margin-bottom: 4px;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 9px;
+  border-radius: var(--rad-sm);
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  font-size: 12.5px;
+  color: rgba(242,237,228,0.55);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  font-family: 'Jost', sans-serif;
+  font-weight: 400;
+}
+.nav-item:hover { background: rgba(255,255,255,0.07); color: rgba(242,237,228,0.88); }
+.nav-item.active { background: rgba(242,237,228,0.12); color: var(--parchment); font-weight: 500; }
+.nav-item.sub { padding-left: 26px; font-size: 12px; }
+.nav-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; opacity: 0.85; }
+.nav-accent { width: 3px; height: 3px; border-radius: 50%; flex-shrink: 0; background: rgba(242,237,228,0.25); margin-left: 2px; }
+
+.nav-footer {
+  margin-top: auto;
+  padding: 14px 18px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  font-family: 'DM Mono', monospace;
+  font-size: 8.5px;
+  color: rgba(242,237,228,0.18);
+  letter-spacing: 0.06em;
+}
+
+/* ── MAIN ────────────────────────────────────────────── */
+main { flex: 1; overflow-y: auto; min-width: 0; }
+
+.page { display: none; }
+.page.active { display: block; }
+
+/* ── PAGE HEADER ─────────────────────────────────────── */
+.page-header {
+  padding: 48px 56px 32px;
+  background: var(--parchment);
+  border-bottom: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+.page-header::after {
+  content: '';
+  position: absolute;
+  right: -40px; bottom: -40px;
+  width: 200px; height: 200px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--cream-deep) 0%, transparent 70%);
+  opacity: 0.6;
+}
+.breadcrumb {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.breadcrumb span { opacity: 0.5; }
+.page-header h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 34px;
+  font-weight: 400;
+  line-height: 1.15;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+.page-header h2 em { font-style: italic; color: var(--ink-mid); }
+.page-header p { font-size: 13px; color: var(--ink-mid); margin-top: 8px; max-width: 520px; font-weight: 300; }
+
+/* ── CONTENT ─────────────────────────────────────────── */
+.content { padding: 36px 56px 80px; }
+
+/* ── OVERVIEW GRID ───────────────────────────────────── */
+.overview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+/* ── MATTER CARD ─────────────────────────────────────── */
+.matter-card {
+  background: var(--parchment);
+  border: 1px solid var(--border);
+  border-radius: var(--rad-lg);
+  padding: 22px 24px;
+  cursor: pointer;
+  transition: box-shadow 0.18s, transform 0.18s, border-color 0.18s;
+  position: relative;
+  overflow: hidden;
+}
+.matter-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 4px;
+  border-radius: var(--rad-lg) 0 0 var(--rad-lg);
+  transition: width 0.18s;
+}
+.matter-card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+  border-color: var(--border-md);
+}
+.matter-card:hover::before { width: 5px; }
+.card-eyebrow {
+  font-family: 'DM Mono', monospace;
+  font-size: 8.5px;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.matter-card h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 1.3;
+  margin-bottom: 7px;
+}
+.matter-card p { font-size: 12px; color: var(--ink-mid); line-height: 1.5; font-weight: 300; }
+.card-count {
+  margin-top: 14px;
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  color: var(--ink-faint);
+  letter-spacing: 0.05em;
+}
+
+/* accent variants */
+.ac-sage  .matter-card::before { background: var(--sage); }
+.ac-sage  .card-eyebrow        { color: var(--sage); }
+.ac-slate .matter-card::before { background: var(--slate); }
+.ac-slate .card-eyebrow        { color: var(--slate); }
+.ac-terra .matter-card::before { background: var(--terracotta); }
+.ac-terra .card-eyebrow        { color: var(--terracotta); }
+.ac-rose  .matter-card::before { background: var(--dusty-rose); }
+.ac-rose  .card-eyebrow        { color: var(--dusty-rose); }
+.ac-mauve .matter-card::before { background: var(--mauve); }
+.ac-mauve .card-eyebrow        { color: var(--mauve); }
+
+/* standalone card (not in grid) */
+.matter-card.standalone::before { border-radius: var(--rad-lg) 0 0 var(--rad-lg); }
+
+/* ── DOCUMENT TILE GRID ──────────────────────────────── */
+.doc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.doc-tile {
+  background: var(--parchment);
+  border: 1px solid var(--border);
+  border-radius: var(--rad);
+  padding: 13px 15px;
+  transition: box-shadow 0.14s, border-color 0.14s;
+}
+.doc-tile:hover { box-shadow: var(--shadow); border-color: var(--border-md); }
+.doc-tile h4 { font-size: 12.5px; font-weight: 500; margin-bottom: 5px; line-height: 1.35; }
+.doc-tile a {
+  font-family: 'DM Mono', monospace;
+  font-size: 10.5px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  opacity: 0.75;
+  transition: opacity 0.13s;
+}
+.doc-tile a:hover { opacity: 1; }
+
+/* ── BACK BUTTON ─────────────────────────────────────── */
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  color: var(--ink-faint);
+  cursor: pointer;
+  border: none;
+  background: none;
+  padding: 0;
+  margin-bottom: 22px;
+  transition: color 0.13s;
+  font-family: 'Jost', sans-serif;
+  letter-spacing: 0.02em;
+}
+.back-btn:hover { color: var(--ink-mid); }
+
+/* ── SUB-SECTION ─────────────────────────────────────── */
+.sub-section { display: none; }
+.sub-section.open { display: block; }
+
+.sub-header { margin-bottom: 24px; }
+.sub-header .title {
+  font-family: 'Playfair Display', serif;
+  font-size: 26px;
+  font-weight: 400;
+  line-height: 1.2;
+  margin-bottom: 4px;
+}
+.sub-header .meta {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  color: var(--ink-faint);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* ── PHASE PANEL ─────────────────────────────────────── */
+.phase-panel {
+  border: 1px solid var(--border);
+  border-radius: var(--rad-lg);
+  background: var(--parchment);
+  margin-bottom: 10px;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.15s;
+}
+.phase-panel.open { box-shadow: var(--shadow); }
+
+.phase-header {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 15px 20px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.13s;
+}
+.phase-header:hover { background: var(--cream-mid); }
+
+.phase-num {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  font-weight: 500;
+  flex-shrink: 0;
+  color: white;
+  letter-spacing: 0;
+}
+.phase-header h4 { font-size: 13.5px; font-weight: 500; flex: 1; letter-spacing: 0.01em; }
+.phase-tag {
+  font-family: 'DM Mono', monospace;
+  font-size: 8.5px;
+  padding: 3px 8px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  flex-shrink: 0;
+}
+.chevron {
+  color: var(--ink-faint);
+  transition: transform 0.22s;
+  flex-shrink: 0;
+  width: 15px; height: 15px;
+}
+.phase-panel.open .chevron { transform: rotate(90deg); }
+
+.phase-body {
+  display: none;
+  padding: 0 20px 18px;
+  border-top: 1px solid var(--border);
+}
+.phase-panel.open .phase-body { display: block; }
+
+/* Steps list */
+.steps { list-style: none; margin-top: 13px; }
+.steps li {
+  display: flex;
+  gap: 10px;
+  padding: 7px 0;
+  border-bottom: 1px solid rgba(44,40,32,0.06);
+  font-size: 13px;
+  line-height: 1.55;
+  font-weight: 300;
+}
+.steps li:last-child { border-bottom: none; }
+.steps li::before {
+  content: '—';
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--stone);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* Doc links strip */
+.doc-strip {
+  margin-top: 13px;
+  padding: 11px 14px;
+  border-radius: var(--rad);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.doc-strip-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 8.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-right: 4px;
+  flex-shrink: 0;
+}
+.doc-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  text-decoration: none;
+  border: 1px solid;
+  padding: 3px 10px;
+  border-radius: 20px;
+  transition: all 0.13s;
+  background: white;
+  font-family: 'DM Mono', monospace;
+  letter-spacing: 0.02em;
+}
+
+/* ── SKIN VARIANTS ───────────────────────────────────── */
+/* sage = commercial */
+.sk-sage .phase-num  { background: var(--sage); }
+.sk-sage .phase-tag  { background: var(--sage-pale); color: var(--sage); }
+.sk-sage .doc-strip  { background: var(--sage-pale); }
+.sk-sage .doc-strip-label { color: var(--sage); }
+.sk-sage .doc-pill   { color: var(--sage); border-color: var(--sage-mid); }
+.sk-sage .doc-pill:hover { background: var(--sage); color: white; border-color: var(--sage); }
+
+/* slate = corporate */
+.sk-slate .phase-num  { background: var(--slate); }
+.sk-slate .phase-tag  { background: var(--slate-pale); color: var(--slate); }
+.sk-slate .doc-strip  { background: var(--slate-pale); }
+.sk-slate .doc-strip-label { color: var(--slate); }
+.sk-slate .doc-pill   { color: var(--slate); border-color: var(--slate-mid); }
+.sk-slate .doc-pill:hover { background: var(--slate); color: white; border-color: var(--slate); }
+
+/* terra = conveyancing */
+.sk-terra .phase-num  { background: var(--terracotta); }
+.sk-terra .phase-tag  { background: var(--terra-pale); color: var(--terracotta); }
+.sk-terra .doc-strip  { background: var(--terra-pale); }
+.sk-terra .doc-strip-label { color: var(--terracotta); }
+.sk-terra .doc-pill   { color: var(--terracotta); border-color: var(--terra-mid); }
+.sk-terra .doc-pill:hover { background: var(--terracotta); color: white; border-color: var(--terracotta); }
+
+/* rose = litigation */
+.sk-rose .phase-num  { background: var(--dusty-rose); }
+.sk-rose .phase-tag  { background: var(--rose-pale); color: var(--dusty-rose); }
+.sk-rose .doc-strip  { background: var(--rose-pale); }
+.sk-rose .doc-strip-label { color: var(--dusty-rose); }
+.sk-rose .doc-pill   { color: var(--dusty-rose); border-color: var(--rose-mid); }
+.sk-rose .doc-pill:hover { background: var(--dusty-rose); color: white; border-color: var(--dusty-rose); }
+
+/* mauve = career */
+.sk-mauve .phase-num  { background: var(--mauve); }
+.sk-mauve .phase-tag  { background: var(--mauve-pale); color: var(--mauve); }
+.sk-mauve .doc-strip  { background: var(--mauve-pale); }
+.sk-mauve .doc-strip-label { color: var(--mauve); }
+.sk-mauve .doc-pill   { color: var(--mauve); border-color: var(--mauve-mid); }
+.sk-mauve .doc-pill:hover { background: var(--mauve); color: white; border-color: var(--mauve); }
+
+/* ── SECTION DIVIDER ─────────────────────────────────── */
+.section-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--ink-faint);
+  margin: 28px 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* ── CAREER TABS ─────────────────────────────────────── */
+.tab-bar {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 26px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+.tab-btn {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: var(--parchment);
+  color: var(--ink-mid);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.14s;
+  font-family: 'Jost', sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+.tab-btn:hover { border-color: var(--border-md); color: var(--ink); }
+.tab-btn.active { background: var(--ink); color: var(--parchment); border-color: var(--ink); }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ── NOTE CARD ───────────────────────────────────────── */
+.note-card {
+  background: var(--parchment);
+  border: 1px solid var(--border);
+  border-radius: var(--rad-lg);
+  padding: 20px 24px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow-sm);
+}
+.note-card h4 {
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  letter-spacing: 0.01em;
+}
+.note-tag {
+  font-family: 'DM Mono', monospace;
+  font-size: 8.5px;
+  padding: 2px 7px;
+  border-radius: var(--rad-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  font-weight: 400;
+}
+.note-items { list-style: none; }
+.note-items li {
+  padding: 5px 0 5px 14px;
+  font-size: 13px;
+  line-height: 1.55;
+  border-bottom: 1px solid rgba(44,40,32,0.06);
+  position: relative;
+  font-weight: 300;
+}
+.note-items li::before {
+  content: '·';
+  position: absolute;
+  left: 0;
+  color: var(--stone);
+  font-size: 18px;
+  top: 1px;
+}
+.note-items li:last-child { border-bottom: none; }
+.callout {
+  background: #fdf8ee;
+  border-left: 3px solid var(--stone-dark);
+  padding: 10px 14px;
+  border-radius: 0 var(--rad) var(--rad) 0;
+  font-size: 12.5px;
+  font-style: italic;
+  color: var(--ink-mid);
+  margin: 10px 0;
+  font-weight: 300;
+}
+
+/* ── DASHBOARD ───────────────────────────────────────── */
+.dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+.dash-card {
+  background: var(--parchment);
+  border: 1px solid var(--border);
+  border-radius: var(--rad-lg);
+  padding: 22px 24px;
+  box-shadow: var(--shadow-sm);
+}
+.dash-card h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px;
+  font-weight: 400;
+  margin-bottom: 4px;
+}
+.dash-card .sub-text { font-size: 11.5px; color: var(--ink-faint); margin-bottom: 14px; font-family: 'DM Mono', monospace; letter-spacing: 0.04em; }
+.dash-list { list-style: none; }
+.dash-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 12.5px;
+  cursor: pointer;
+  transition: color 0.12s;
+  font-weight: 300;
+}
+.dash-list li:last-child { border-bottom: none; }
+.dash-list li:hover { color: var(--sage); }
+.count-pill {
+  font-family: 'DM Mono', monospace;
+  font-size: 8.5px;
+  padding: 2px 7px;
+  border-radius: 20px;
+  flex-shrink: 0;
+}
+
+/* Quick links */
+.quick-links-card { background: var(--parchment); border: 1px solid var(--border); border-radius: var(--rad-lg); padding: 22px 24px; box-shadow: var(--shadow-sm); }
+.quick-links-card h3 { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 400; margin-bottom: 4px; }
+.quick-links-card .sub-text { font-size: 11.5px; color: var(--ink-faint); margin-bottom: 14px; font-family: 'DM Mono', monospace; letter-spacing: 0.04em; }
+.quick-links { display: flex; flex-wrap: wrap; gap: 8px; }
+.q-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 13px;
+  background: var(--cream);
+  border: 1px solid var(--border);
+  border-radius: var(--rad);
+  font-size: 12px;
+  color: var(--ink-mid);
+  text-decoration: none;
+  transition: all 0.14s;
+  font-weight: 300;
+}
+.q-link:hover { background: var(--sage-pale); color: var(--sage); border-color: var(--sage-mid); }
+
+/* ── HELPER ──────────────────────────────────────────── */
+.gap-section { margin-top: 28px; }
+.note-text { font-size: 12.5px; color: var(--ink-mid); margin-bottom: 18px; font-weight: 300; font-style: italic; }
+
+/* ── EDIT MODE ───────────────────────────────────────── */
+#edit-toolbar {
+  position: fixed; bottom: 24px; right: 24px;
+  display: flex; align-items: center; gap: 8px;
+  z-index: 9999; font-family: 'Jost', sans-serif;
+}
+.toolbar-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 9px 16px; border-radius: 24px; border: none;
+  font-size: 12.5px; font-family: 'Jost', sans-serif; font-weight: 500;
+  cursor: pointer; transition: all 0.16s;
+  box-shadow: 0 2px 12px rgba(44,40,32,0.18); letter-spacing: 0.02em;
+}
+#btn-edit { background: var(--ink); color: var(--parchment); }
+#btn-edit:hover { background: #3d3830; }
+#btn-edit.active { background: var(--sage); color: white; }
+#btn-save { background: var(--sage); color: white; display: none; }
+#btn-save:hover { background: #4a6a4e; }
+#btn-save.saving { background: var(--stone-dark); pointer-events: none; }
+#btn-discard { background: var(--parchment); color: var(--ink-mid); border: 1px solid var(--border); display: none; }
+#btn-discard:hover { background: var(--cream-mid); }
+#btn-settings { background: var(--parchment); color: var(--ink-mid); border: 1px solid var(--border); padding: 9px 13px; font-size: 14px; }
+#btn-settings:hover { background: var(--cream-mid); color: var(--ink); }
+/* Settings btn always clickable — never disabled by saving state */
+#btn-settings { pointer-events: auto !important; }
+#edit-banner {
+  display: none; position: fixed; top: 0; left: 0; right: 0;
+  background: var(--sage); color: white; text-align: center;
+  font-size: 11px; font-family: 'DM Mono', monospace;
+  letter-spacing: 0.1em; padding: 5px; z-index: 9998; text-transform: uppercase;
+}
+body.edit-mode #edit-banner { display: block; }
+body.edit-mode main { padding-top: 26px; }
+body.edit-mode [contenteditable] {
+  outline: none; border-radius: 3px;
+  transition: background 0.14s, box-shadow 0.14s; cursor: text;
+}
+body.edit-mode [contenteditable]:hover {
+  background: rgba(90,122,94,0.08);
+  box-shadow: 0 0 0 2px rgba(90,122,94,0.25);
+}
+body.edit-mode [contenteditable]:focus {
+  background: rgba(90,122,94,0.12);
+  box-shadow: 0 0 0 2px var(--sage);
+}
+#gh-modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(44,40,32,0.45); backdrop-filter: blur(3px);
+  z-index: 10000; align-items: center; justify-content: center;
+}
+#gh-modal-overlay.open { display: flex; }
+#gh-modal {
+  background: var(--parchment); border-radius: var(--rad-lg);
+  padding: 32px 36px; width: 480px; max-width: 94vw;
+  box-shadow: var(--shadow-lg); font-family: 'Jost', sans-serif;
+}
+#gh-modal h3 { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 400; margin-bottom: 6px; }
+#gh-modal p { font-size: 12.5px; color: var(--ink-mid); margin-bottom: 18px; line-height: 1.6; font-weight: 300; }
+#gh-modal p a { color: var(--sage); text-decoration: underline; }
+.modal-field { margin-bottom: 14px; }
+.modal-label { font-family: 'DM Mono', monospace; font-size: 9.5px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-faint); margin-bottom: 5px; display: block; }
+.modal-input { width: 100%; padding: 9px 12px; border: 1px solid var(--border-md); border-radius: var(--rad); font-family: 'DM Mono', monospace; font-size: 12px; background: var(--cream); color: var(--ink); outline: none; transition: border-color 0.14s; }
+.modal-input:focus { border-color: var(--sage); }
+.modal-hint { font-size: 11px; color: var(--ink-faint); margin-top: 4px; font-family: 'DM Mono', monospace; }
+.modal-actions { display: flex; gap: 8px; margin-top: 22px; }
+.modal-btn { flex: 1; padding: 9px; border-radius: var(--rad); border: none; font-size: 13px; font-family: 'Jost', sans-serif; font-weight: 500; cursor: pointer; transition: all 0.14s; }
+.modal-btn.primary { background: var(--sage); color: white; }
+.modal-btn.primary:hover { background: #4a6a4e; }
+.modal-btn.secondary { background: var(--cream-mid); color: var(--ink-mid); }
+.modal-btn.secondary:hover { background: var(--cream-deep); }
+#gh-error { font-size: 11.5px; color: var(--dusty-rose); margin-top: 10px; display: none; font-family: 'DM Mono', monospace; }
+#toast {
+  position: fixed; bottom: 80px; right: 24px;
+  padding: 10px 18px; border-radius: var(--rad);
+  font-size: 12px; font-family: 'DM Mono', monospace; letter-spacing: 0.04em;
+  color: white; z-index: 10001;
+  transform: translateY(10px); opacity: 0;
+  transition: all 0.22s; pointer-events: none;
+}
+#toast.show { transform: translateY(0); opacity: 1; }
+#toast.success { background: var(--sage); }
+#toast.error { background: var(--dusty-rose); }
+#toast.info { background: var(--slate); }
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- ════════════════════════════════════
+     SIDEBAR
+════════════════════════════════════ -->
+<nav class="sidebar">
+  <div class="nav-brand">
+    <div class="wordmark">Legal Workflow</div>
+    <div class="sub">PLT · Junior Solicitor · NSW</div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Overview</div>
+    <button class="nav-item active" onclick="nav(this);showPage('home')">
+      <span class="nav-dot" style="background:#c8bfb0"></span>Dashboard
+    </button>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Commercial</div>
+    <button class="nav-item" onclick="nav(this);showPage('commercial')">
+      <span class="nav-dot" style="background:var(--sage)"></span>All commercial
+    </button>
+    <button class="nav-item sub" onclick="nav(this);showPage('commercial');openSub('bl')">
+      <span class="nav-accent"></span>Business &amp; Lease
+    </button>
+    <button class="nav-item sub" onclick="nav(this);showPage('commercial');openSub('comm-corp')">
+      <span class="nav-accent"></span>Commercial (corporate)
+    </button>
+    <button class="nav-item sub" onclick="nav(this);showPage('commercial');openSub('intl')">
+      <span class="nav-accent"></span>International
+    </button>
+    <button class="nav-item sub" onclick="nav(this);showPage('commercial');openSub('other-comm')">
+      <span class="nav-accent"></span>Other commercial services
+    </button>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Corporate</div>
+    <button class="nav-item" onclick="nav(this);showPage('corporate')">
+      <span class="nav-dot" style="background:var(--slate)"></span>All corporate
+    </button>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Conveyancing</div>
+    <button class="nav-item" onclick="nav(this);showPage('conveyance')">
+      <span class="nav-dot" style="background:var(--terracotta)"></span>All conveyancing
+    </button>
+    <button class="nav-item sub" onclick="nav(this);showPage('conveyance');openSub('land')">
+      <span class="nav-accent"></span>Purchase &amp; Sale — Land
+    </button>
+    <button class="nav-item sub" onclick="nav(this);showPage('conveyance');openSub('mortgage')">
+      <span class="nav-accent"></span>Mortgage &amp; Loan
+    </button>
+    <button class="nav-item sub" onclick="nav(this);showPage('conveyance');openSub('settlement')">
+      <span class="nav-accent"></span>Prepare for Settlement
+    </button>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Civil Litigation</div>
+    <button class="nav-item" onclick="nav(this);showPage('litigation')">
+      <span class="nav-dot" style="background:var(--dusty-rose)"></span>All litigation
+    </button>
+    <button class="nav-item sub" onclick="nav(this);showPage('litigation');openSub('debt')">
+      <span class="nav-accent"></span>Debt recovery
+    </button>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Career</div>
+    <button class="nav-item" onclick="nav(this);showPage('career')">
+      <span class="nav-dot" style="background:var(--mauve)"></span>Soft skills &amp; craft
+    </button>
+  </div>
+
+  <div class="nav-footer">📁 NSW Court Practice · Google Drive</div>
+</nav>
+
+<!-- ════════════════════════════════════
+     MAIN
+════════════════════════════════════ -->
+<main>
+
+<!-- ─── DASHBOARD ──────────────────────────────── -->
+<div id="page-home" class="page active">
+  <div class="page-header">
+    <div class="breadcrumb">Dashboard</div>
+    <h2>Your legal <em>workflow</em></h2>
+    <p>SOPs structured after your Google Drive · career notes from PLT · direct links to every template and folder</p>
+  </div>
+  <div class="content">
+    <div class="dash-grid">
+      <div class="dash-card">
+        <h3>Practice areas</h3>
+        <div class="sub-text">Click to navigate</div>
+        <ul class="dash-list">
+          <li onclick="showPage('commercial')">Commercial <span class="count-pill" style="background:var(--sage-pale);color:var(--sage)">4 subcategories</span></li>
+          <li onclick="showPage('corporate')">Corporate <span class="count-pill" style="background:var(--slate-pale);color:var(--slate)">11 matter types</span></li>
+          <li onclick="showPage('conveyance')">Conveyancing <span class="count-pill" style="background:var(--terra-pale);color:var(--terracotta)">3 areas</span></li>
+          <li onclick="showPage('litigation')">Civil Litigation <span class="count-pill" style="background:var(--rose-pale);color:var(--dusty-rose)">6 stages</span></li>
+        </ul>
+      </div>
+      <div class="dash-card">
+        <h3>Career notes</h3>
+        <div class="sub-text">From Notion PLT notes</div>
+        <ul class="dash-list">
+          <li onclick="showPage('career');setTab('interviewing')">Client interviewing</li>
+          <li onclick="showPage('career');setTab('writing')">Legal writing &amp; drafting</li>
+          <li onclick="showPage('career');setTab('advocacy')">Advocacy &amp; court conduct</li>
+          <li onclick="showPage('career');setTab('ethics')">Ethics &amp; risk management</li>
+          <li onclick="showPage('career');setTab('professional')">Professional growth</li>
+        </ul>
+      </div>
+    </div>
+    <div class="quick-links-card">
+      <h3>Google Drive — quick access</h3>
+      <div class="sub-text">NSW Court Practice root folder</div>
+      <div class="quick-links">
+        <a class="q-link" href="https://drive.google.com/drive/folders/1PZNemAtTIVOgTWReNUOD8GH2ukMo3h4Q" target="_blank">📁 NSW Court Practice</a>
+        <a class="q-link" href="https://drive.google.com/drive/folders/1cTy9aGzT2MPWHZ52k8oOkMBexbYxwWCI" target="_blank">📁 Commercial</a>
+        <a class="q-link" href="https://drive.google.com/drive/folders/1ikKszqYPXgNy7sTDAZwwg84RzXBA48pj" target="_blank">📁 Corporate</a>
+        <a class="q-link" href="https://drive.google.com/drive/folders/1g4Br_IEovkazBsVonuwVkY8v0arTkZGF" target="_blank">📁 Conveyance</a>
+        <a class="q-link" href="https://drive.google.com/drive/folders/13wTS-XbO5J_CVwV5TY52pLiWj5u5qEzZ" target="_blank">📁 Civil Litigation</a>
+        <a class="q-link" href="https://drive.google.com/drive/folders/1Z2prQ7XkHiLmtIZRLOU3xzEgAnN9SoR_" target="_blank">📁 Legal Research</a>
+        <a class="q-link" href="https://www.legislation.nsw.gov.au" target="_blank">⚖️ NSW Legislation</a>
+        <a class="q-link" href="https://www.austlii.edu.au" target="_blank">⚖️ AustLII</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── COMMERCIAL ─────────────────────────────── -->
+<div id="page-commercial" class="page">
+  <div class="page-header">
+    <div class="breadcrumb">Commercial</div>
+    <h2>Commercial <em>matters</em></h2>
+    <p>Business &amp; Lease · Commercial corporate structures · International transactions · Other commercial services</p>
+  </div>
+  <div class="content">
+
+    <!-- Overview -->
+    <div id="ov-commercial" class="ac-sage">
+      <div class="overview-grid">
+        <div class="matter-card" onclick="openSub('bl')">
+          <div class="card-eyebrow">Business &amp; Lease</div>
+          <h3>Business sales, leases &amp; franchises</h3>
+          <p>Purchase/sale of business (with or without lease), retail &amp; commercial leases, franchise purchase, licence agreements, settlement prep.</p>
+          <div class="card-count">9 matter types → click to explore</div>
+        </div>
+        <div class="matter-card" onclick="openSub('comm-corp')">
+          <div class="card-eyebrow">Commercial</div>
+          <h3>Corporate structures &amp; registrations</h3>
+          <p>Commercial loans, family/unit trusts, ABN/ACN registration, consolidating &amp; registering by-laws.</p>
+          <div class="card-count">5 matter types → click to explore</div>
+        </div>
+        <div class="matter-card" onclick="openSub('intl')">
+          <div class="card-eyebrow">International</div>
+          <h3>International commercial transactions</h3>
+          <p>Cross-border contracts, Incoterms reference, international sale of goods, export/import documentation.</p>
+          <div class="card-count">Reference materials → click to explore</div>
+        </div>
+        <div class="matter-card" onclick="openSub('other-comm')">
+          <div class="card-eyebrow">Other commercial services</div>
+          <h3>Caveat · Deed · Employment · Family · Will</h3>
+          <p>Caveat, deed, employment agreement (bespoke), family law, general legal service, transfer of property, will, power of attorney.</p>
+          <div class="card-count">8 matter types → click to explore</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── BUSINESS & LEASE ── -->
+    <div id="sub-bl" class="sub-section">
+      <button class="back-btn" onclick="closeSub('commercial')">← All commercial</button>
+      <div class="sub-header">
+        <div class="title">Business &amp; Lease</div>
+        <div class="meta">Commercial · Business &amp; Lease subfolder</div>
+      </div>
+
+      <div class="section-label">Document folders</div>
+      <div class="doc-grid">
+        <div class="doc-tile"><h4>Purchase of Business (incl. lease)</h4><a href="https://drive.google.com/drive/folders/1XlmpLUk0wF-OUTpkWOTXDreG41ROdunH" target="_blank" style="color:var(--sage)">Open folder →</a></div>
+        <div class="doc-tile"><h4>Purchase of Business (excl. lease)</h4><a href="https://drive.google.com/drive/folders/1Jdb_Fc0B_4t3-ALRiH4GBVDdfoLyJWWg" target="_blank" style="color:var(--sage)">Open folder →</a></div>
+        <div class="doc-tile"><h4>Sale of Business (new lease)</h4><a href="https://drive.google.com/drive/folders/1eA0ih_CwFMaqFe-iXJeYeQ3IJuKY8cLm" target="_blank" style="color:var(--sage)">Open folder →</a></div>
+        <div class="doc-tile"><h4>Purchase of Franchise</h4><a href="https://drive.google.com/drive/folders/1EgWhezdijLpQkmjh9oLsoKrgRcjKSXFZ" target="_blank" style="color:var(--sage)">Open folder →</a></div>
+        <div class="doc-tile"><h4>Commercial Lease</h4><a href="https://drive.google.com/drive/folders/1eg7HPc9WLRjFT3Y966blenQQ8bIVKYvC" target="_blank" style="color:var(--sage)">Open folder →</a></div>
+        <div class="doc-tile"><h4>Commercial Lease (for landlord)</h4><a href="https://drive.google.com/drive/folders/1s3Xb4vNOFmNbZjFLtmuE9doDyFaWexnA" target="_blank" style="color:var(--sage)">Open folder →</a></div>
+        <div class="doc-tile"><h4>Retail Lease</h4><a href="https://drive.google.com/drive/folders/1AGTxie8ZiTxk9djom_74Uy5VwbQsXcZK" target="_blank" style="color:var(--sage)">Open folder →</a></div>
+        <div class="doc-tile"><h4>Prepare for Settlement</h4><a href="https://drive.google.com/drive/folders/1hgt0ymjVW-p949jJhDISdWgqk6HLvNRZ" target="_blank" style="color:var(--sage)">Open folder →</a></div>
+        <div class="doc-tile"><h4>Deed of Exclusivity</h4><a href="https://drive.google.com/file/d/1i5KhORffdlofv698NrK9fYsWZg5KHiSR/view" target="_blank" style="color:var(--sage)">Open .docx →</a></div>
+        <div class="doc-tile"><h4>Licence Agreement</h4><a href="https://drive.google.com/file/d/13rEs7GxDysyCTs2m0oP8VVLo0lBzTDG0/view" target="_blank" style="color:var(--sage)">Open .docx →</a></div>
+      </div>
+
+      <div class="section-label">Workflow — general business sale/purchase</div>
+      <p class="note-text">Adapt per matter type above. Check whether a lease is included — this determines which subfolder applies.</p>
+
+      <div class="phase-panel sk-sage open">
+        <div class="phase-header" onclick="togglePhase(this)">
+          <div class="phase-num">1</div><h4>Intake &amp; conflict check</h4>
+          <span class="phase-tag">Foundation</span>
+          <svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div class="phase-body">
+          <ul class="steps">
+            <li>Run conflict check — confirm no existing client on the other side before accepting instructions</li>
+            <li>Obtain client ID / AML documents; confirm who gives instructions (individual, company, trustee)</li>
+            <li>Issue cost agreement and retainer; obtain signed authority to proceed</li>
+            <li>Confirm applicable contract edition (2021 NSW Contract for Sale &amp; Purchase of Business)</li>
+            <li>Determine: does transaction include a lease? → select correct Drive subfolder</li>
+          </ul>
+          <div class="doc-strip"><span class="doc-strip-label">📁</span>
+            <a class="doc-pill" href="https://drive.google.com/drive/folders/1s28EI1BKYGCo8FUhyDQWXt2YH5p5Cu0p" target="_blank">Business &amp; Lease folder</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="phase-panel sk-sage">
+        <div class="phase-header" onclick="togglePhase(this)">
+          <div class="phase-num">2</div><h4>Due diligence &amp; contract review</h4>
+          <span class="phase-tag">Investigation</span>
+          <svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div class="phase-body">
+          <ul class="steps">
+            <li>Review contract schedules — employees, plant &amp; equipment, goodwill, IP, trading stock</li>
+            <li>PPSR search — identify registered security interests; obtain release obligations</li>
+            <li>ASIC / ABN / company search on vendor and purchaser entity</li>
+            <li>Review lease — landlord consent required? Assignment conditions? Rent review mechanism?</li>
+            <li>Review franchisor arrangements — consent and transfer conditions if franchise</li>
+            <li>Identify key person / restraint of trade obligations — restraint deeds required?</li>
+            <li>Advise client on outstanding information; negotiate special conditions as required</li>
+          </ul>
+          <div class="doc-strip"><span class="doc-strip-label">📁</span>
+            <a class="doc-pill" href="https://drive.google.com/drive/folders/1XlmpLUk0wF-OUTpkWOTXDreG41ROdunH" target="_blank">Purchase (incl. lease)</a>
+            <a class="doc-pill" href="https://drive.google.com/drive/folders/1Jdb_Fc0B_4t3-ALRiH4GBVDdfoLyJWWg" target="_blank">Purchase (excl. lease)</a>
+            <a class="doc-pill" href="https://drive.google.com/drive/folders/1eA0ih_CwFMaqFe-iXJeYeQ3IJuKY8cLm" target="_blank">Sale of Business</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="phase-panel sk-sage">
+        <div class="phase-header" onclick="togglePhase(this)">
+          <div class="phase-num">3</div><h4>Pre-settlement preparation</h4>
+          <span class="phase-tag">Execution</span>
+          <svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div class="phase-body">
+          <ul class="steps">
+            <li>Confirm satisfaction of all conditions precedent (finance, due diligence, consents)</li>
+            <li>Obtain all required consents — landlord, franchisor, licensor</li>
+            <li>Prepare or review restraint deed, novation agreements, employee letters</li>
+            <li>PPSR discharge — confirm release obtained prior to settlement</li>
+            <li>Prepare settlement agenda; confirm figures and obligations with other solicitor</li>
+            <li>Arrange trading stock adjustment / stocktake procedure if required</li>
+            <li>Confirm transfer of domain, website, social media, phone numbers, utilities</li>
+          </ul>
+          <div class="doc-strip"><span class="doc-strip-label">📁</span>
+            <a class="doc-pill" href="https://drive.google.com/drive/folders/1hgt0ymjVW-p949jJhDISdWgqk6HLvNRZ" target="_blank">Prepare for Settlement</a>
+            <a class="doc-pill" href="https://drive.google.com/file/d/1i5KhORffdlofv698NrK9fYsWZg5KHiSR/view" target="_blank">Deed of Exclusivity</a>
+            <a class="doc-pill" href="https://drive.google.com/file/d/13rEs7GxDysyCTs2m0oP8VVLo0lBzTDG0/view" target="_blank">Licence Agreement</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="phase-panel sk-sage">
+        <div class="phase-header" onclick="togglePhase(this)">
+          <div class="phase-num">4</div><h4>Settlement &amp; file closure</h4>
+          <span class="phase-tag">Completion</span>
+          <svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div class="phase-body">
+          <ul class="steps">
+            <li>Attend settlement — exchange documents, confirm funds received/paid</li>
+            <li>Release deposit to vendor upon settlement (if held in trust)</li>
+            <li>Register any PPSR discharge or new security interests post-settlement</li>
+            <li>Notify relevant parties — ATO, employees, franchisor, utilities</li>
+            <li>Post-settlement letter to client; issue final invoice; close file</li>
+          </ul>
+        </div>
+      </div>
+    </div><!-- /sub-bl -->
+
+    <!-- ── COMMERCIAL CORPORATE ── -->
+    <div id="sub-comm-corp" class="sub-section">
+      <button class="back-btn" onclick="closeSub('commercial')">← All commercial</button>
+      <div class="sub-header">
+        <div class="title">Commercial — corporate structures</div>
+        <div class="meta">Commercial · Commercial subfolder</div>
+      </div>
+      <div class="doc-grid">
+        <div class="doc-tile"><h4>Commercial Loan</h4><a href="https://drive.google.com/drive/folders/1zvi0_nGRdIBdKFgwGAXdWIaRv9YiGpXL" target="_blank" style="color:var(--sage)">Open folder →</a></div>
+        <div class="doc-tile"><h4>Family / Unit Trust</h4><a href="https://drive.google.com/drive/folders/1Zrve6TdcQBxhR7XGsUFmvZS61djOQgwW" target="_blank" style="color:var(--sage)">Open folder →</a></div>
+        <div class="doc-tile"><h4>Registering ABN</h4><a href="https://drive.google.com/drive/folders/1kLNzNOgVEIMny7QmcMfKbSBS5U7n1nti" target="_blank" style="color:var(--sage)">Open folder →</a></div>
+        <div class="doc-tile"><h4>Registering ACN</h4><a href="https://drive.google.com/drive/folders/14qJ2mZt6DWTI4ypiCpJnSGos8Q4s60gi" target="_blank" style="color:var(--sage)">Open folder →</a></div>
+        <div class="doc-tile"><h4>Consolidating By-laws</h4><a href="https://drive.google.com/drive/folders/1OPS7k5DC_3dRg4jljak-VAf4aVo1tj6l" target="_blank" style="color:var(--sage)">Open folder →</a></div>
+        <div class="doc-tile"><h4>Privacy policy drafting</h4><a href="https://docs.google.com/document/d/10DDokQ1_J3ymochyqMa5VfhCHHQWzyboZAV0FmGl7QE/edit" target="_blank" style="color:var(--sage)">Open doc →</a></div>
+      </div>
+
+      <div class="section-label">Workflow — commercial loan</div>
+      <div class="phase-panel sk-sage open">
+        <div class="phase-header" onclick="togglePhase(this)">
+          <div class="phase-num">1</div><h4>Instructions &amp; terms review</h4><span class="phase-tag">Foundation</span>
+          <svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div class="phase-body"><ul class="steps">
+          <li>Conflict check; obtain instructions from lender or borrower; confirm role</li>
+          <li>Review loan term sheet — principal, interest rate, term, repayment schedule, security</li>
+          <li>Identify security package — mortgage over land, PPSR security interest, personal guarantee</li>
+          <li>Advise client on terms; negotiate any amendments to the draft facility agreement</li>
+        </ul></div>
+      </div>
+      <div class="phase-panel sk-sage">
+        <div class="phase-header" onclick="togglePhase(this)">
+          <div class="phase-num">2</div><h4>Drafting &amp; execution</h4><span class="phase-tag">Drafting</span>
+          <svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div class="phase-body"><ul class="steps">
+          <li>Draft or review facility agreement; prepare ancillary security documents</li>
+          <li>If mortgage — coordinate with conveyancing team; prepare mortgage instrument</li>
+          <li>Prepare and register PPSR security interest (PMSI or general security agreement)</li>
+          <li>Prepare guarantee documentation; advise guarantor independently where required</li>
+          <li>Arrange execution by all parties; attend to any witnessing requirements</li>
+        </ul><div class="doc-strip"><span class="doc-strip-label">📁</span>
+          <a class="doc-pill" href="https://drive.google.com/drive/folders/1zvi0_nGRdIBdKFgwGAXdWIaRv9YiGpXL" target="_blank">Commercial Loan folder</a>
+        </div></div>
+      </div>
+      <div class="phase-panel sk-sage">
+        <div class="phase-header" onclick="togglePhase(this)">
+          <div class="phase-num">3</div><h4>Registration &amp; drawdown</h4><span class="phase-tag">Completion</span>
+          <svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div class="phase-body"><ul class="steps">
+          <li>Lodge PPSR financing statement within required timeframe (24–72 hrs from signing)</li>
+          <li>Confirm registration of mortgage at Land Registry Services if real property security</li>
+          <li>Confirm drawdown conditions satisfied; notify lender to release funds</li>
+          <li>Report to client; issue final invoice; retain loan documents on file</li>
+        </ul></div>
+      </div>
+
+      <div class="section-label">Workflow — family / unit trust</div>
+      <div class="phase-panel sk-sage open">
+        <div class="phase-header" onclick="togglePhase(this)">
+          <div class="phase-num">1</div><h4>Structuring advice &amp; instructions</h4><span class="phase-tag">Foundation</span>
+          <svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div class="phase-body"><ul class="steps">
+          <li>Conflict check; obtain instructions; clarify purpose of trust (asset protection, estate planning, investment)</li>
+          <li>Confirm structure: discretionary (family) trust or unit trust — different tax and control implications</li>
+          <li>Identify trustee: individual, company (preferred for liability protection); confirm if new company needs to be set up</li>
+          <li>Refer to accountant / tax advisor for stamp duty and CGT advice on transfer of assets into trust</li>
+        </ul></div>
+      </div>
+      <div class="phase-panel sk-sage">
+        <div class="phase-header" onclick="togglePhase(this)">
+          <div class="phase-num">2</div><h4>Drafting trust deed</h4><span class="phase-tag">Drafting</span>
+          <svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div class="phase-body"><ul class="steps">
+          <li>Draft trust deed — settlor, trustee, beneficiaries, vesting date, trustee powers, income distribution</li>
+          <li>For unit trust: define units, unit holders, unit transfer restrictions, redemption mechanism</li>
+          <li>Advise trustee on duties: duty to account, act impartially, invest prudently</li>
+          <li>Prepare any accompanying corporate trustee documents (shareholders agreement, director resolutions)</li>
+        </ul><div class="doc-strip"><span class="doc-strip-label">📁</span>
+          <a class="doc-pill" href="https://drive.google.com/drive/folders/1Zrve6TdcQBxhR7XGsUFmvZS61djOQgwW" target="_blank">Family / Unit Trust folder</a>
+        </div></div>
+      </div>
+      <div class="phase-panel sk-sage">
+        <div class="phase-header" onclick="togglePhase(this)">
+          <div class="phase-num">3</div><h4>Execution &amp; registration</h4><span class="phase-tag">Completion</span>
+          <svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div class="phase-body"><ul class="steps">
+          <li>Execute trust deed — settlor signs; trustee executes and dates after settlor</li>
+          <li>Pay stamp duty on trust deed if applicable in NSW (currently $500 nominal for discretionary trusts)</li>
+          <li>Apply for TFN and ABN for trust; open trust bank account</li>
+          <li>Register for GST if required; advise client on ongoing trust administration obligations</li>
+        </ul></div>
+      </div>
+
+      <div class="section-label">Workflow — ABN / ACN registration</div>
+      <div class="phase-panel sk-sage open">
+        <div class="phase-header" onclick="togglePhase(this)">
+          <div class="phase-num">1</div><h4>Instructions &amp; entity confirmation</h4><span class="phase-tag">Foundation</span>
+          <svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div class="phase-body"><ul class="steps">
+          <li>Confirm entity type: sole trader (ABN only), company (ACN + ABN), trust, partnership</li>
+          <li>Confirm business activity and business name registration requirements</li>
+          <li>Obtain director / member details, date of birth, TFN, residential address for ASIC lodgement</li>
+        </ul></div>
+      </div>
+      <div class="phase-panel sk-sage">
+        <div class="phase-header" onclick="togglePhase(this)">
+          <div class="phase-num">2</div><h4>Registration &amp; completion</h4><span class="phase-tag">Completion</span>
+          <svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div class="phase-body"><ul class="steps">
+          <li>ACN: Lodge Form 201 (Incorporating a Company) with ASIC via ASIC Connect; pay lodgement fee</li>
+          <li>Obtain certificate of incorporation and ACN from ASIC</li>
+          <li>ABN: Apply via Australian Business Register (ABR); link ABN to ACN for companies</li>
+          <li>Register for GST if turnover expected to exceed $75,000; consider PAYG withholding registration</li>
+          <li>Confirm business name registration via ASIC if trading under a name other than legal name</li>
+          <li>Report to client; forward all certificates and registration confirmations</li>
+        </ul><div class="doc-strip"><span class="doc-strip-label">📁</span>
+          <a class="doc-pill" href="https://drive.google.com/drive/folders/1kLNzNOgVEIMny7QmcMfKbSBS5U7n1nti" target="_blank">Registering ABN</a>
+          <a class="doc-pill" href="https://drive.google.com/drive/folders/14qJ2mZt6DWTI4ypiCpJnSGos8Q4s60gi" target="_blank">Registering ACN</a>
+        </div></div>
+      </div>
+    </div><!-- /sub-comm-corp -->
+
+    <!-- ── INTERNATIONAL ── -->
+    <div id="sub-intl" class="sub-section">
+      <button class="back-btn" onclick="closeSub('commercial')">← All commercial</button>
+      <div class="sub-header">
+        <div class="title">International commercial transactions</div>
+        <div class="meta">Commercial · International Commercial Transaction subfolder</div>
+      </div>
+      <div class="doc-grid">
+        <div class="doc-tile"><h4>Incoterms reference (shipping diagram)</h4><a href="https://drive.google.com/file/d/1RAZI9GsXh--3kgLwk2d8BjNjWdRBuRL8/view" target="_blank" style="color:var(--sage)">Open image →</a></div>
+        <div class="doc-tile"><h4>International Transaction folder</h4><a href="https://drive.google.com/drive/folders/1x4zlZLI4ZlZupauXWqf4v3iLQnss45rX" target="_blank" style="color:var(--sage)">Open folder →</a></div>
+      </div>
+      <div class="section-label">Workflow — international sale of goods</div>
+      <div class="phase-panel sk-sage open">
+        <div class="phase-header" onclick="togglePhase(this)">
+          <div class="phase-num">1</div><h4>Instructions &amp; jurisdiction check</h4><span class="phase-tag">Foundation</span>
+          <svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div class="phase-body"><ul class="steps">
+          <li>Confirm parties: Australian exporter/importer and foreign counterpart; confirm governing law clause (prefer NSW)</li>
+          <li>Check if CISG (UN Convention on Contracts for International Sale of Goods) applies — exclude expressly if not wanted</li>
+          <li>Identify Incoterms rule applicable — FOB, CIF, DAP, DDP etc. — determines risk transfer and cost allocation</li>
+          <li>Review import/export controls — AUSTRADE, DFAT permits, sanctions compliance</li>
+        </ul></div>
+      </div>
+      <div class="phase-panel sk-sage">
+        <div class="phase-header" onclick="togglePhase(this)">
+          <div class="phase-num">2</div><h4>Drafting the contract</h4><span class="phase-tag">Drafting</span>
+          <svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div class="phase-body"><ul class="steps">
+          <li>Draft or review international sale contract — description of goods, price, payment terms (LC, TT, open account)</li>
+          <li>Include force majeure, dispute resolution (SIAC arbitration preferred for Asia-Pacific), and confidentiality clauses</li>
+          <li>Payment security: letter of credit — advise on documentary requirements and strict compliance rule</li>
+          <li>Insurance: confirm cargo insurance obligations under chosen Incoterms</li>
+        </ul><div class="doc-strip"><span class="doc-strip-label">📁</span>
+          <a class="doc-pill" href="https://drive.google.com/file/d/1RAZI9GsXh--3kgLwk2d8BjNjWdRBuRL8/view" target="_blank">Incoterms diagram</a>
+        </div></div>
+      </div>
+      <div class="phase-panel sk-sage">
+        <div class="phase-header" onclick="togglePhase(this)">
+          <div class="phase-num">3</div><h4>Execution &amp; shipment</h4><span class="phase-tag">Completion</span>
+          <svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div class="phase-body"><ul class="steps">
+          <li>Coordinate execution — electronic or wet ink depending on jurisdiction; apostille if required</li>
+          <li>Confirm shipping documentation: bill of lading, commercial invoice, packing list, certificate of origin</li>
+          <li>Monitor payment — confirm LC presented and complying documents tendered within time</li>
+          <li>Advise on dispute resolution if goods rejected, delayed, or payment refused</li>
+        </ul></div>
+      </div>
+    </div><!-- /sub-intl -->
+
+    <!-- ── OTHER COMMERCIAL SERVICES ── -->
+    <div id="sub-other-comm" class="sub-section">
+      <button class="back-btn" onclick="closeSub('commercial')">← All commercial</button>
+      <div class="sub-header">
+        <div class="title">Other commercial services</div>
+        <div class="meta">Commercial · Other Commercial Services subfolder</div>
+      </div>
+      <div class="doc-grid">
+        <div class="doc-tile"><h4>Caveat</h4><a href="https://drive.google.com/drive/folders/185-Ktj8mtpZ9n75PQXzBjJN0b-NP0q2-" target="_blank" style="color:var(--sage)">Open folder →</a></div>
+        <div class="doc-tile"><h4>Deed</h4><a href="https://drive.google.com/drive/folders/1HqTAPbF4nNcUgZS2uGNqGy8aa-n1OtTz" target="_blank" style="color:var(--sage)">Open folder →</a></div>
+        <div class="doc-tile"><h4>Employment agreement (bespoke)</h4><a href="https://drive.google.com/drive/folders/11heRAkukzM22V8102e_eN7oWzkS5Cf_O" target="_blank" style="color:var(--sage)">Open folder →</a></div>
+        <div class="doc-tile"><h4>Family law</h4><a href="https://drive.google.com/drive/folders/1bdgfCERMzIO1DHHXsBu6ltXg_-0QJwfj" target="_blank" style="color:var(--sage)">Open folder →</a></div>
+        <div class="doc-tile"><h4>General legal service</h4><a href="https://drive.google.com/drive/folders/165d7nK5eCcVXfocGMpNhk78gdAyaacX0" target="_blank" style="color:var(--sage)">Open folder →</a></div>
+        <div class="doc-tile"><h4>Transfer of property</h4><a href="https://drive.google.com/drive/folders/1fi2A3Ci3DrU1I0pNvL3ZBYMag9spsXvO" target="_blank" style="color:var(--sage)">Open folder →</a></div>
+        <div class="doc-tile"><h4>Will</h4><a href="https://drive.google.com/drive/folders/1-6ocGHO2QPYkNlOUW3kTI1kzrcWin69f" target="_blank" style="color:var(--sage)">Open folder →</a></div>
+        <div class="doc-tile"><h4>Power of Attorney</h4><a href="https://docs.google.com/document/d/1Xf6rBsdejEihRGqxYCbxXcaB92E5Us-zHt5MKWLqJUY/edit" target="_blank" style="color:var(--sage)">Open doc →</a></div>
+      </div>
+
+      <div class="section-label">Workflow — Caveat</div>
+      <div class="phase-panel sk-sage open">
+        <div class="phase-header" onclick="togglePhase(this)"><div class="phase-num">1</div><h4>Instructions &amp; caveatable interest</h4><span class="phase-tag">Foundation</span><svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+        <div class="phase-body"><ul class="steps">
+          <li>Confirm client has a caveatable interest — equitable interest (unpaid vendor, constructive trust, equitable charge)</li>
+          <li>Warn client: lodging a caveat without reasonable cause attracts liability in damages (s74P Real Property Act 1900 NSW)</li>
+          <li>Identify the property on title; obtain CT reference and registered proprietor's name</li>
+        </ul></div>
+      </div>
+      <div class="phase-panel sk-sage">
+        <div class="phase-header" onclick="togglePhase(this)"><div class="phase-num">2</div><h4>Lodgement &amp; monitoring</h4><span class="phase-tag">Lodgement</span><svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+        <div class="phase-body"><ul class="steps">
+          <li>Prepare caveat — identify caveatable interest precisely, extent of prohibition, caveator's address for service</li>
+          <li>Lodge via PEXA (electronic) or NSW LRS; pay lodgement fee</li>
+          <li>Lapsing notice: if served, client has 21 days to obtain court order extending caveat or caveat lapses — diarise immediately</li>
+          <li>Advise client to pursue underlying claim; caveat is protective only, not a substitute for proceedings</li>
+        </ul><div class="doc-strip"><span class="doc-strip-label">📁</span><a class="doc-pill" href="https://drive.google.com/drive/folders/185-Ktj8mtpZ9n75PQXzBjJN0b-NP0q2-" target="_blank">Caveat folder</a></div></div>
+      </div>
+
+      <div class="section-label">Workflow — Deed</div>
+      <div class="phase-panel sk-sage open">
+        <div class="phase-header" onclick="togglePhase(this)"><div class="phase-num">1</div><h4>Drafting &amp; execution</h4><span class="phase-tag">Drafting</span><svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+        <div class="phase-body"><ul class="steps">
+          <li>Identify why a deed is required — consideration not given, deed required by statute, or for added enforceability</li>
+          <li>Draft deed — clear recitals, operative clauses, execution block (signed, sealed, delivered); no bare agreement language</li>
+          <li>Execution: each party signs before a witness who is present; witness signs and provides address</li>
+          <li>Company execution: s127 Corporations Act — two directors, or one director + company secretary, or sole director/secretary; no witness required for s127</li>
+          <li>Retain original deed on file; provide certified copy to client</li>
+        </ul><div class="doc-strip"><span class="doc-strip-label">📁</span><a class="doc-pill" href="https://drive.google.com/drive/folders/1HqTAPbF4nNcUgZS2uGNqGy8aa-n1OtTz" target="_blank">Deed folder</a></div></div>
+      </div>
+
+      <div class="section-label">Workflow — Employment Agreement (bespoke)</div>
+      <div class="phase-panel sk-sage open">
+        <div class="phase-header" onclick="togglePhase(this)"><div class="phase-num">1</div><h4>Instructions &amp; legislative compliance</h4><span class="phase-tag">Foundation</span><svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+        <div class="phase-body"><ul class="steps">
+          <li>Confirm applicable industrial instrument — Modern Award (which award?), Enterprise Agreement, or award-free</li>
+          <li>Confirm classification, remuneration, and whether agreement will meet or exceed NES and Award minimum</li>
+          <li>Identify key clauses needed: confidentiality, IP assignment, restraint of trade, garden leave</li>
+        </ul></div>
+      </div>
+      <div class="phase-panel sk-sage">
+        <div class="phase-header" onclick="togglePhase(this)"><div class="phase-num">2</div><h4>Drafting &amp; execution</h4><span class="phase-tag">Drafting</span><svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+        <div class="phase-body"><ul class="steps">
+          <li>Draft employment agreement — role, remuneration, hours, leave, IP, confidentiality, termination notice, post-employment restraints</li>
+          <li>Restraint of trade: must be reasonable in scope, geography, and duration — cascade clause recommended</li>
+          <li>Fair Work Act 2009: ensure no contravention of general protections, adverse action provisions</li>
+          <li>Executive contracts: include bonus KPIs, equity vesting, termination payment mechanics</li>
+          <li>Arrange execution; provide written notice of Fair Work Information Statement to new employee</li>
+        </ul><div class="doc-strip"><span class="doc-strip-label">📁</span><a class="doc-pill" href="https://drive.google.com/drive/folders/11heRAkukzM22V8102e_eN7oWzkS5Cf_O" target="_blank">Employment folder</a></div></div>
+      </div>
+
+      <div class="section-label">Workflow — Will</div>
+      <div class="phase-panel sk-sage open">
+        <div class="phase-header" onclick="togglePhase(this)"><div class="phase-num">1</div><h4>Instructions &amp; testamentary capacity</h4><span class="phase-tag">Foundation</span><svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+        <div class="phase-body"><ul class="steps">
+          <li>Confirm testamentary capacity — does client understand nature and effect of a will, extent of property, claims of family?</li>
+          <li>Satisfy yourself client is not under undue influence — meet alone where possible</li>
+          <li>Obtain full picture: assets (real property, bank accounts, superannuation, shares, business interests), liabilities, dependants</li>
+          <li>Note: superannuation does not form part of the estate — binding death benefit nomination required separately</li>
+        </ul></div>
+      </div>
+      <div class="phase-panel sk-sage">
+        <div class="phase-header" onclick="togglePhase(this)"><div class="phase-num">2</div><h4>Drafting &amp; execution</h4><span class="phase-tag">Drafting</span><svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+        <div class="phase-body"><ul class="steps">
+          <li>Draft will — executor, trustee (if minors involved), specific bequests, residuary estate, guardianship of minor children</li>
+          <li>Consider testator's family maintenance claims — adequate provision for eligible persons (Succession Act 2006 NSW Pt 3.2)</li>
+          <li>Execution: testator signs in presence of two adult witnesses; witnesses must not be beneficiaries</li>
+          <li>Safekeeping: advise client to store original in a secure location; offer safe custody if firm practice</li>
+          <li>Advise on reviewing the will after major life events — marriage, divorce, birth of children, acquisition of property</li>
+        </ul><div class="doc-strip"><span class="doc-strip-label">📁</span><a class="doc-pill" href="https://drive.google.com/drive/folders/1-6ocGHO2QPYkNlOUW3kTI1kzrcWin69f" target="_blank">Will folder</a></div></div>
+      </div>
+
+      <div class="section-label">Workflow — Power of Attorney</div>
+      <div class="phase-panel sk-sage open">
+        <div class="phase-header" onclick="togglePhase(this)"><div class="phase-num">1</div><h4>Instructions &amp; type of POA</h4><span class="phase-tag">Foundation</span><svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+        <div class="phase-body"><ul class="steps">
+          <li>Determine type: general POA (ceases on incapacity), enduring POA (survives incapacity), or limited/specific POA</li>
+          <li>Confirm donor has capacity; satisfy yourself no undue influence</li>
+          <li>Identify attorney(s) and scope of authority — financial decisions, property transactions, personal/lifestyle decisions (enduring guardianship is separate)</li>
+        </ul></div>
+      </div>
+      <div class="phase-panel sk-sage">
+        <div class="phase-header" onclick="togglePhase(this)"><div class="phase-num">2</div><h4>Drafting &amp; registration</h4><span class="phase-tag">Completion</span><svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+        <div class="phase-body"><ul class="steps">
+          <li>Use prescribed form under Powers of Attorney Act 2003 NSW; include any limitations or conditions</li>
+          <li>Execution: donor signs before an authorised witness (solicitor, barrister, JP, notary); witness certifies capacity</li>
+          <li>If POA will be used for land transactions — must be registered with NSW LRS; prepare registration documents</li>
+          <li>Provide certified copies to attorney; advise attorney of duties and responsibilities</li>
+        </ul><div class="doc-strip"><span class="doc-strip-label">📁</span><a class="doc-pill" href="https://docs.google.com/document/d/1Xf6rBsdejEihRGqxYCbxXcaB92E5Us-zHt5MKWLqJUY/edit" target="_blank">Power of Attorney doc</a></div></div>
+      </div>
+
+      <div class="section-label">Workflow — Family law (general intake)</div>
+      <div class="phase-panel sk-sage open">
+        <div class="phase-header" onclick="togglePhase(this)"><div class="phase-num">1</div><h4>Initial consultation &amp; safety check</h4><span class="phase-tag">Foundation</span><svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+        <div class="phase-body"><ul class="steps">
+          <li>Conflict check — confirm you do not act or have not acted for the other party in the matter</li>
+          <li>Safety screening: domestic violence, family violence orders, children at risk — document carefully; refer to DV services if needed</li>
+          <li>Confirm jurisdiction: Federal Circuit and Family Court of Australia (FCFCOA) for family law matters</li>
+          <li>Identify issues: property settlement, parenting arrangements, child support, spousal maintenance, divorce</li>
+        </ul></div>
+      </div>
+      <div class="phase-panel sk-sage">
+        <div class="phase-header" onclick="togglePhase(this)"><div class="phase-num">2</div><h4>Pre-action procedure &amp; negotiation</h4><span class="phase-tag">Negotiation</span><svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+        <div class="phase-body"><ul class="steps">
+          <li>Family law pre-action procedure (property): write to other party; attempt genuine negotiation before filing</li>
+          <li>Parenting: attempt family dispute resolution (FDR) with accredited FDR practitioner; obtain s60I certificate before filing (exceptions: urgency, DV, child abuse)</li>
+          <li>Financial disclosure: exchange s13A Financial Statement; mutual duty of full and frank disclosure</li>
+          <li>Consider consent orders or parenting plan if parties can reach agreement</li>
+        </ul><div class="doc-strip"><span class="doc-strip-label">📁</span><a class="doc-pill" href="https://drive.google.com/drive/folders/1bdgfCERMzIO1DHHXsBu6ltXg_-0QJwfj" target="_blank">Family law folder</a></div></div>
+      </div>
+
+      <div class="section-label">Workflow — Transfer of property (inter-party / gift)</div>
+      <div class="phase-panel sk-sage open">
+        <div class="phase-header" onclick="togglePhase(this)"><div class="phase-num">1</div><h4>Instructions &amp; stamp duty advice</h4><span class="phase-tag">Foundation</span><svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+        <div class="phase-body"><ul class="steps">
+          <li>Confirm parties and nature of transfer: commercial sale, gift, family arrangement, relationship breakdown</li>
+          <li>Stamp duty: NSW transfer duty applies on market value regardless of consideration paid — advise client</li>
+          <li>Exemptions: matrimonial home exemption, deceased estate, certain family farm transfers — check eligibility</li>
+          <li>CGT: advise transferor on CGT implications — main residence exemption, cost base, timing</li>
+        </ul></div>
+      </div>
+      <div class="phase-panel sk-sage">
+        <div class="phase-header" onclick="togglePhase(this)"><div class="phase-num">2</div><h4>Transfer &amp; registration</h4><span class="phase-tag">Completion</span><svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+        <div class="phase-body"><ul class="steps">
+          <li>Prepare transfer instrument; obtain valuation if required for duty assessment</li>
+          <li>Lodge duty assessment with Revenue NSW; pay duty; obtain duty endorsement</li>
+          <li>Lodge transfer at NSW LRS via PEXA or manual lodgement; pay registration fee</li>
+          <li>Confirm title updated in Land Registry; report to parties; close file</li>
+        </ul><div class="doc-strip"><span class="doc-strip-label">📁</span><a class="doc-pill" href="https://drive.google.com/drive/folders/1fi2A3Ci3DrU1I0pNvL3ZBYMag9spsXvO" target="_blank">Transfer of property folder</a></div></div>
+      </div>
+    </div><!-- /sub-other-comm -->
+
+  </div><!-- /content -->
+</div><!-- /page-commercial -->
+
+<!-- ─── CORPORATE ───────────────────────────────── -->
+<div id="page-corporate" class="page">
+  <div class="page-header">
+    <div class="breadcrumb">Corporate</div>
+    <h2>Corporate <em>matters</em></h2>
+    <p>Company set-up · shares · constitution · shareholders agreements · takeovers · service agreements · deeds of indemnity</p>
+  </div>
+  <div class="content">
+    <div class="doc-grid" style="margin-bottom:24px">
+      <div class="doc-tile"><h4>00. Cost Agreement</h4><a href="https://drive.google.com/drive/folders/1oWNxdERVcxviOtqF__oHWXA05adpKDX8" target="_blank" style="color:var(--slate)">Open folder →</a></div>
+      <div class="doc-tile"><h4>01. Set Up Company</h4><a href="https://drive.google.com/drive/folders/15UFxrRy-LDognVUaoUAnwbk0OCtEzReu" target="_blank" style="color:var(--slate)">Open folder →</a></div>
+      <div class="doc-tile"><h4>01.1 Deeds &amp; Agreements</h4><a href="https://drive.google.com/drive/folders/1_Hdn4RewzUjeXXnmnzViD0A6MiLvIsrT" target="_blank" style="color:var(--slate)">Open folder →</a></div>
+      <div class="doc-tile"><h4>01.2 Due Diligence</h4><a href="https://drive.google.com/drive/folders/17RIqUM-uTJGHcj9WOHoZSDYQeFEmo1-t" target="_blank" style="color:var(--slate)">Open folder →</a></div>
+      <div class="doc-tile"><h4>02. Transfer / Sale of Shares</h4><a href="https://drive.google.com/drive/folders/1FxikHAVXqbIX9_aYSZkbvKRosNfD0hcT" target="_blank" style="color:var(--slate)">Open folder →</a></div>
+      <div class="doc-tile"><h4>03. Company Constitution</h4><a href="https://drive.google.com/drive/folders/1M-X-5NQGp6W7yUFN6uKsQsvb_lk7jzQn" target="_blank" style="color:var(--slate)">Open folder →</a></div>
+      <div class="doc-tile"><h4>04. Shareholders Agreement</h4><a href="https://drive.google.com/drive/folders/1Wx8eUyu0B5yEWxL_BKA0sY8ucF1LgXc5" target="_blank" style="color:var(--slate)">Open folder →</a></div>
+      <div class="doc-tile"><h4>05. Project Mgmt Service Agreement</h4><a href="https://drive.google.com/drive/folders/1lXAb6EdDiJXW1iEG_WpdAZLGEsVG_GQa" target="_blank" style="color:var(--slate)">Open folder →</a></div>
+      <div class="doc-tile"><h4>06. Takeover &amp; Acquisition</h4><a href="https://drive.google.com/drive/folders/1VH_3dhzBKxKaVeBjEwkKUDhzJAXexndp" target="_blank" style="color:var(--slate)">Open folder →</a></div>
+      <div class="doc-tile"><h4>07. Deed of Indemnity</h4><a href="https://drive.google.com/drive/folders/146GOdUYKz_kk-7mJoODm1X-gmXj1MWnj" target="_blank" style="color:var(--slate)">Open folder →</a></div>
+      <div class="doc-tile"><h4>08. Referral &amp; Commission Agreement</h4><a href="https://drive.google.com/drive/folders/1OETwpoU5TvSKm1tM5x0-9NxA1WoPQBsB" target="_blank" style="color:var(--slate)">Open folder →</a></div>
+    </div>
+
+    <div class="section-label">Workflow — company set-up &amp; incorporation</div>
+    <div class="phase-panel sk-slate open">
+      <div class="phase-header" onclick="togglePhase(this)"><div class="phase-num">1</div><h4>Instructions &amp; structure advice</h4><span class="phase-tag">Foundation</span><svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+      <div class="phase-body"><ul class="steps">
+        <li>Conflict check; obtain instructions; confirm who gives instructions if multiple founders</li>
+        <li>Advise on entity type: Pty Ltd, public company, incorporated association, trust — different liability, tax, and governance consequences</li>
+        <li>Confirm number and identity of directors and shareholders; confirm share structure (classes, voting rights, dividend rights)</li>
+        <li>Discuss need for shareholders agreement alongside constitution — who has control, deadlock resolution, exit mechanisms</li>
+      </ul><div class="doc-strip"><span class="doc-strip-label">📁</span><a class="doc-pill" href="https://drive.google.com/drive/folders/1oWNxdERVcxviOtqF__oHWXA05adpKDX8" target="_blank">00. Cost Agreement</a></div></div>
+    </div>
+    <div class="phase-panel sk-slate">
+      <div class="phase-header" onclick="togglePhase(this)"><div class="phase-num">2</div><h4>Incorporation &amp; ASIC lodgement</h4><span class="phase-tag">Registration</span><svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+      <div class="phase-body"><ul class="steps">
+        <li>Lodge Form 201 (Incorporating a Company) with ASIC via ASIC Connect; pay incorporation fee</li>
+        <li>Obtain ACN and certificate of registration; confirm company name availability</li>
+        <li>Register ABN; register for GST if turnover expected above $75,000; register for PAYG withholding</li>
+        <li>Prepare company registers: members register, directors register, share register, options register</li>
+      </ul><div class="doc-strip"><span class="doc-strip-label">📁</span><a class="doc-pill" href="https://drive.google.com/drive/folders/15UFxrRy-LDognVUaoUAnwbk0OCtEzReu" target="_blank">01. Set Up Company</a></div></div>
+    </div>
+    <div class="phase-panel sk-slate">
+      <div class="phase-header" onclick="togglePhase(this)"><div class="phase-num">3</div><h4>Constitution &amp; shareholders agreement</h4><span class="phase-tag">Governance</span><svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+      <div class="phase-body"><ul class="steps">
+        <li>Draft bespoke constitution or adopt replaceable rules (s135 Corporations Act); lodge with ASIC if adopting constitution</li>
+        <li>Draft shareholders agreement — board composition, reserved matters, pre-emptive rights, drag-along, tag-along, deadlock</li>
+        <li>Issue shares — prepare share certificates; record issue in share register; lodge ASIC notification (Form 484)</li>
+        <li>Hold first directors' meeting — appoint officers, open bank account, adopt common seal if required</li>
+      </ul><div class="doc-strip"><span class="doc-strip-label">📁</span>
+        <a class="doc-pill" href="https://drive.google.com/drive/folders/1M-X-5NQGp6W7yUFN6uKsQsvb_lk7jzQn" target="_blank">03. Constitution</a>
+        <a class="doc-pill" href="https://drive.google.com/drive/folders/1Wx8eUyu0B5yEWxL_BKA0sY8ucF1LgXc5" target="_blank">04. SHA</a>
+        <a class="doc-pill" href="https://drive.google.com/drive/folders/1_Hdn4RewzUjeXXnmnzViD0A6MiLvIsrT" target="_blank">01.1 Deeds &amp; Agreements</a>
+      </div></div>
+    </div>
+
+    <div class="section-label">Workflow — transfer / sale of shares</div>
+    <div class="phase-panel sk-slate open">
+      <div class="phase-header" onclick="togglePhase(this)"><div class="phase-num">1</div><h4>Pre-transfer checks</h4><span class="phase-tag">Investigation</span><svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+      <div class="phase-body"><ul class="steps">
+        <li>Review constitution and SHA for pre-emptive rights, consent requirements, transfer restrictions</li>
+        <li>Confirm shares are fully paid; check for any security interests registered over shares on PPSR</li>
+        <li>Agree on price: fixed price, formula, or independent valuation; agree on completion mechanism</li>
+        <li>Due diligence on company if buyer's side: financials, IP, contracts, litigation, regulatory</li>
+      </ul><div class="doc-strip"><span class="doc-strip-label">📁</span><a class="doc-pill" href="https://drive.google.com/drive/folders/17RIqUM-uTJGHcj9WOHoZSDYQeFEmo1-t" target="_blank">01.2 Due Diligence</a></div></div>
+    </div>
+    <div class="phase-panel sk-slate">
+      <div class="phase-header" onclick="togglePhase(this)"><div class="phase-num">2</div><h4>Share sale agreement &amp; completion</h4><span class="phase-tag">Completion</span><svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+      <div class="phase-body"><ul class="steps">
+        <li>Draft share sale agreement — representations and warranties, conditions precedent, completion mechanics, W&amp;I insurance if applicable</li>
+        <li>Execute transfer instrument; obtain board approval of transfer if required by constitution</li>
+        <li>Update share register; cancel old share certificate; issue new share certificate to buyer</li>
+        <li>Lodge Form 484 with ASIC to notify change in share structure; stamp duty (NSW: $10 per $1,000 of value or market value)</li>
+      </ul><div class="doc-strip"><span class="doc-strip-label">📁</span><a class="doc-pill" href="https://drive.google.com/drive/folders/1FxikHAVXqbIX9_aYSZkbvKRosNfD0hcT" target="_blank">02. Transfer / Sale of Shares</a></div></div>
+    </div>
+
+    <div class="section-label">Workflow — takeover &amp; acquisition</div>
+    <div class="phase-panel sk-slate open">
+      <div class="phase-header" onclick="togglePhase(this)"><div class="phase-num">1</div><h4>Preliminary &amp; due diligence</h4><span class="phase-tag">Investigation</span><svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+      <div class="phase-body"><ul class="steps">
+        <li>Conflict check; confirm role (acquirer or target); consider information firewall if acting for both</li>
+        <li>Execute NDA / confidentiality agreement before sharing any due diligence material</li>
+        <li>Structure analysis: asset purchase vs share purchase — different risk, stamp duty, employment obligations</li>
+        <li>Legal due diligence: corporate, IP, contracts, litigation, regulatory, environmental, employment</li>
+      </ul><div class="doc-strip"><span class="doc-strip-label">📁</span><a class="doc-pill" href="https://drive.google.com/drive/folders/17RIqUM-uTJGHcj9WOHoZSDYQeFEmo1-t" target="_blank">01.2 Due Diligence</a></div></div>
+    </div>
+    <div class="phase-panel sk-slate">
+      <div class="phase-header" onclick="togglePhase(this)"><div class="phase-num">2</div><h4>Transaction documents &amp; completion</h4><span class="phase-tag">Completion</span><svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+      <div class="phase-body"><ul class="steps">
+        <li>Draft SPA / BPA — conditions precedent, representations and warranties, indemnities, completion accounts</li>
+        <li>ACCC merger clearance: required if acquisition may substantially lessen competition (market share &gt;20%)</li>
+        <li>FIRB approval: required if acquirer is foreign person and threshold met; diarise 30/90 day review period</li>
+        <li>Completion meeting: exchange signed documents, transfer consideration, update registers, notify ASIC</li>
+        <li>Post-completion: transfer licences, notify employees, integrate systems, satisfy earnout conditions</li>
+      </ul><div class="doc-strip"><span class="doc-strip-label">📁</span><a class="doc-pill" href="https://drive.google.com/drive/folders/1VH_3dhzBKxKaVeBjEwkKUDhzJAXexndp" target="_blank">06. Takeover &amp; Acquisition</a></div></div>
+    </div>
+
+    <div class="section-label">Workflow — deed of indemnity &amp; referral/commission agreement</div>
+    <div class="phase-panel sk-slate open">
+      <div class="phase-header" onclick="togglePhase(this)"><div class="phase-num">1</div><h4>Instructions, drafting &amp; execution</h4><span class="phase-tag">Drafting</span><svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+      <div class="phase-body"><ul class="steps">
+        <li>Deed of indemnity: confirm scope — which liabilities, what cap, what exclusions (fraud, wilful misconduct); check D&amp;O insurance position</li>
+        <li>Draft using deed formalities (signed, sealed, delivered; independent witness)</li>
+        <li>Referral/commission agreement: confirm fee structure, trigger event for commission, clawback provisions, ASIC licensing implications if financial product involved</li>
+        <li>Obtain legal sign-off; arrange execution; retain on file</li>
+      </ul><div class="doc-strip"><span class="doc-strip-label">📁</span>
+        <a class="doc-pill" href="https://drive.google.com/drive/folders/146GOdUYKz_kk-7mJoODm1X-gmXj1MWnj" target="_blank">07. Deed of Indemnity</a>
+        <a class="doc-pill" href="https://drive.google.com/drive/folders/1OETwpoU5TvSKm1tM5x0-9NxA1WoPQBsB" target="_blank">08. Referral &amp; Commission</a>
+      </div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── CONVEYANCING ────────────────────────────── -->
+<div id="page-conveyance" class="page">
+  <div class="page-header">
+    <div class="breadcrumb">Conveyancing</div>
+    <h2>Conveyancing <em>matters</em></h2>
+    <p>Purchase &amp; Sale of Land · Mortgage &amp; Loan · Prepare for Settlement</p>
+  </div>
+  <div class="content">
+    <div id="ov-conveyance" class="ac-terra">
+      <div class="overview-grid">
+        <div class="matter-card" onclick="openSub('land')"><div class="card-eyebrow">1 · Purchase &amp; Sale Land</div><h3>NSW residential &amp; rural property</h3><p>2026 Contract, eCOS conditions, special conditions, vendor disclosure, rural requisitions, put &amp; call option, surcharge liability.</p><div class="card-count">10 documents → click to explore</div></div>
+        <div class="matter-card" onclick="openSub('mortgage')"><div class="card-eyebrow">2 · Mortgage &amp; Loan</div><h3>Mortgage documents &amp; loan contracts</h3><p>Loan contract, national standardised mortgage form, schedule to mortgage, authority to complete, direction to pay, planning certificate, lease.</p><div class="card-count">7 documents → click to explore</div></div>
+        <div class="matter-card" onclick="openSub('settlement')"><div class="card-eyebrow">3 · Prepare for Settlement</div><h3>Pre-settlement &amp; PEXA documents</h3><p>PEXA client authorisation, reply to requisitions, clearance certificate, OSR s47, vendor ID.</p><div class="card-count">5 documents → click to explore</div></div>
+      </div>
+    </div>
+
+    <!-- LAND -->
+    <div id="sub-land" class="sub-section">
+      <button class="back-btn" onclick="closeSub('conveyance')">← All conveyancing</button>
+      <div class="sub-header"><div class="title">Purchase &amp; Sale — Land (NSW)</div><div class="meta">Conveyance · 1. Purchase &amp; Sale — Land — NSW folder</div></div>
+      <div class="doc-grid">
+        <div class="doc-tile"><h4>(a) 2026 Contract Front Pages</h4><a href="https://drive.google.com/file/d/1UDPonWbMh8mCu3JT-PNrXq2i_yFqasHL/view" target="_blank" style="color:var(--terracotta)">Open PDF →</a></div>
+        <div class="doc-tile"><h4>(b) eCOS General Conditions</h4><a href="https://drive.google.com/file/d/1LxSdFJ47OV38dD8mm5rMhcqbh7VK4gXk/view" target="_blank" style="color:var(--terracotta)">Open PDF →</a></div>
+        <div class="doc-tile"><h4>(c) Special Conditions</h4><a href="https://drive.google.com/file/d/1mmHMi4_LrUQcUAkXvDeIBorGCbXwjQ11/view" target="_blank" style="color:var(--terracotta)">Open .docx →</a></div>
+        <div class="doc-tile"><h4>Vendor Disclosure Flowchart</h4><a href="https://drive.google.com/file/d/1ZGNRPuuY-8Xi8wfqx-Q69_HneuALn600/view" target="_blank" style="color:var(--terracotta)">Open PDF →</a></div>
+        <div class="doc-tile"><h4>(k) Rural Land Requisitions</h4><a href="https://drive.google.com/file/d/1hpytszb1WREI4oe9_krIB6gYszC1drzW/view" target="_blank" style="color:var(--terracotta)">Open PDF →</a></div>
+        <div class="doc-tile"><h4>(l) Lodgement Exception Form</h4><a href="https://drive.google.com/file/d/11seTbjnEQtg2d3VAMyFk0EZBKQi0SWYA/view" target="_blank" style="color:var(--terracotta)">Open PDF →</a></div>
+        <div class="doc-tile"><h4>(j) Lease doc — TBD</h4><a href="https://docs.google.com/document/d/1cU-BVks3YdxTNrwfOAmglVHCP2RSBSI_lOMBzjWbkwM/edit" target="_blank" style="color:var(--terracotta)">Open doc →</a></div>
+        <div class="doc-tile"><h4>(m) Water Licence Transfer — TBD</h4><a href="https://docs.google.com/document/d/1_eHeouTob13JNPFPAZWT26lToyxmWEhXIvVZKbg3sUM/edit" target="_blank" style="color:var(--terracotta)">Open doc →</a></div>
+        <div class="doc-tile"><h4>Put and Call Option</h4><a href="https://docs.google.com/document/d/1ayFKnVmh-h_MElEdgDmJlmNPe_sHeBO9wJvnGbs5K20/edit" target="_blank" style="color:var(--terracotta)">Open doc →</a></div>
+        <div class="doc-tile"><h4>Surcharge liability for individuals</h4><a href="https://docs.google.com/document/d/1C9awafQu82CLwSMYHKMysO8z39ydSZK8cEtQ7SmGN04/edit" target="_blank" style="color:var(--terracotta)">Open doc →</a></div>
+      </div>
+      <div class="section-label">Workflow</div>
+      <div class="phase-panel sk-terra open"><div class="phase-header" onclick="togglePhase(this)"><div class="phase-num">1</div><h4>Intake, contract review &amp; pre-exchange advice</h4><span class="phase-tag">Foundation</span><svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+        <div class="phase-body"><ul class="steps">
+          <li>Conflict check; file opening; cost agreement</li>
+          <li>Review Contract for Sale of Land 2026 NSW — title, vendor disclosure docs, easements, zoning</li>
+          <li>Review s10.7 planning certificate — zoning, heritage, bushfire, contamination, flooding</li>
+          <li>Advise purchaser on terms, special conditions, and any concerns prior to exchange</li>
+          <li>Negotiate amendments; prepare counter-schedule if required</li>
+          <li>Finance condition: confirm approval status; advise on risks of exchanging without finance approval</li>
+          <li>Check surcharge purchaser duty liability if applicable (foreign person — s104JA Duties Act 1997 NSW)</li>
+        </ul><div class="doc-strip"><span class="doc-strip-label">📁</span>
+          <a class="doc-pill" href="https://drive.google.com/file/d/1UDPonWbMh8mCu3JT-PNrXq2i_yFqasHL/view" target="_blank">(a) 2026 Contract</a>
+          <a class="doc-pill" href="https://drive.google.com/file/d/1LxSdFJ47OV38dD8mm5rMhcqbh7VK4gXk/view" target="_blank">(b) eCOS</a>
+          <a class="doc-pill" href="https://drive.google.com/file/d/1mmHMi4_LrUQcUAkXvDeIBorGCbXwjQ11/view" target="_blank">(c) Special Conditions</a>
+          <a class="doc-pill" href="https://drive.google.com/file/d/1ZGNRPuuY-8Xi8wfqx-Q69_HneuALn600/view" target="_blank">Vendor Disclosure</a>
+        </div></div>
+      </div>
+      <div class="phase-panel sk-terra"><div class="phase-header" onclick="togglePhase(this)"><div class="phase-num">2</div><h4>Exchange</h4><span class="phase-tag">Binding contract</span><svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+        <div class="phase-body"><ul class="steps">
+          <li>Arrange exchange — in person, post, or through agent; 66W or 66U if cooling-off waiver needed</li>
+          <li>Confirm deposit paid into vendor's solicitor trust account (usually 10%)</li>
+          <li>Diarise: cooling-off expiry, finance deadline, special condition deadlines, settlement date</li>
+          <li>Notify lender/broker; forward contract to bank for mortgage instructions</li>
+          <li>Rural land: check water licence transfer obligations (special conditions 5.2/5.3)</li>
+        </ul><div class="doc-strip"><span class="doc-strip-label">📁</span>
+          <a class="doc-pill" href="https://docs.google.com/document/d/1ayFKnVmh-h_MElEdgDmJlmNPe_sHeBO9wJvnGbs5K20/edit" target="_blank">Put &amp; Call Option</a>
+        </div></div>
+      </div>
+      <div class="phase-panel sk-terra"><div class="phase-header" onclick="togglePhase(this)"><div class="phase-num">3</div><h4>Requisitions &amp; pre-settlement searches</h4><span class="phase-tag">Investigation</span><svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+        <div class="phase-body"><ul class="steps">
+          <li>Issue requisitions on title; raise any title defects, mortgages, or encumbrances</li>
+          <li>Order searches: title search, rates certificate, water certificate, land tax clearance certificate</li>
+          <li>PEXA workspace: create or join; invite mortgagee and vendor's solicitor</li>
+          <li>Stamp duty: confirm liability; lodge with Revenue NSW via PEXA</li>
+          <li>Obtain and execute incoming mortgage documents from bank</li>
+          <li>Rural land: confirm rural requisitions and lodgement exception form if applicable</li>
+        </ul><div class="doc-strip"><span class="doc-strip-label">📁</span>
+          <a class="doc-pill" href="https://docs.google.com/document/d/1NScWZwFw57uQ3lK5aA__rjZdhhUCYQ9Ed1fxxvulYLI/edit" target="_blank">PEXA Authorisation</a>
+          <a class="doc-pill" href="https://docs.google.com/document/d/19R2I_mAPiKoWwfc3ui-r4SivC2kikI1UWYypdztpqqY/edit" target="_blank">Reply to Requisitions</a>
+          <a class="doc-pill" href="https://docs.google.com/document/d/1KHGzFOJ0ae9FSdR4m_VcKPfFvyaaKq5MNC7XnoZhfe8/edit" target="_blank">Clearance Certificate</a>
+          <a class="doc-pill" href="https://docs.google.com/document/d/1ON85KUs0HnUfNWo2Dtt0O038cSnKrT59BoOSpu8AHNI/edit" target="_blank">OSR s47</a>
+          <a class="doc-pill" href="https://drive.google.com/file/d/1hpytszb1WREI4oe9_krIB6gYszC1drzW/view" target="_blank">(k) Rural Requisitions</a>
+        </div></div>
+      </div>
+      <div class="phase-panel sk-terra"><div class="phase-header" onclick="togglePhase(this)"><div class="phase-num">4</div><h4>Settlement (PEXA) &amp; post-settlement</h4><span class="phase-tag">Completion</span><svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+        <div class="phase-body"><ul class="steps">
+          <li>Confirm settlement date/time with all parties in PEXA workspace</li>
+          <li>Verify settlement figures: balance of price, adjustments (council rates, water), discharge figures</li>
+          <li>Sign and certify transfer electronically in PEXA; authorise settlement</li>
+          <li>Monitor workspace — settlement occurs automatically when all parties ready</li>
+          <li>Notify client; confirm keys/access arranged with agent</li>
+          <li>Confirm title registration in Land Registry Services; report to client; close file</li>
+        </ul><div class="doc-strip"><span class="doc-strip-label">📁</span>
+          <a class="doc-pill" href="https://drive.google.com/drive/folders/1ez5tUwVK1u5O-LYByBURMmCXB_J7h3yZ" target="_blank">3. Prepare for Settlement folder</a>
+        </div></div>
+      </div>
+    </div><!-- /sub-land -->
+
+    <!-- MORTGAGE -->
+    <div id="sub-mortgage" class="sub-section">
+      <button class="back-btn" onclick="closeSub('conveyance')">← All conveyancing</button>
+      <div class="sub-header"><div class="title">Mortgage &amp; Loan</div><div class="meta">Conveyance · 2. Mortgage &amp; Loan — Land folder</div></div>
+      <div class="doc-grid">
+        <div class="doc-tile"><h4>(a) Loan Contract</h4><a href="https://docs.google.com/document/d/1PQaZyu-0ThGxpKJigYZAGIEdTp2xR_oa7XvTyhY569c/edit" target="_blank" style="color:var(--terracotta)">Open doc →</a></div>
+        <div class="doc-tile"><h4>(b) National Standardised Mortgage Form</h4><a href="https://docs.google.com/document/d/1YFCbYwsmpfUw1JfayxGuWzWzjQQkIUeiJVUsYZeLuIQ/edit" target="_blank" style="color:var(--terracotta)">Open doc →</a></div>
+        <div class="doc-tile"><h4>(b2) Schedule to Mortgage Form</h4><a href="https://docs.google.com/document/d/1AXGZQLXst5iqdDTEX0zxOAMSV_NssLdSo-YSNTx0kQk/edit" target="_blank" style="color:var(--terracotta)">Open doc →</a></div>
+        <div class="doc-tile"><h4>(c) Authority to Complete &amp; Undertaking</h4><a href="https://docs.google.com/document/d/1Y7mMiAD_ZnhBWmiTASAwtg18DQLb56S0a1aWUDApzbg/edit" target="_blank" style="color:var(--terracotta)">Open doc →</a></div>
+        <div class="doc-tile"><h4>(d) Direction to Pay</h4><a href="https://docs.google.com/document/d/13UtLb4c7fnwPVlivx705w9AvenYTkGUxYqyJRfseZJo/edit" target="_blank" style="color:var(--terracotta)">Open doc →</a></div>
+        <div class="doc-tile"><h4>(e) Lease</h4><a href="https://docs.google.com/document/d/1ocPaLLlWln-BUkTBz_5GvI891DHhY55SLP7n4M5BNt0/edit" target="_blank" style="color:var(--terracotta)">Open doc →</a></div>
+        <div class="doc-tile"><h4>(f) Planning Certificate</h4><a href="https://docs.google.com/document/d/18zIJNwl-i1-814hlGoaPFCvHIEYlBMbb_smPOdI8J8s/edit" target="_blank" style="color:var(--terracotta)">Open doc →</a></div>
+      </div>
+      <div class="section-label">Workflow — mortgage instructions</div>
+      <div class="phase-panel sk-terra open"><div class="phase-header" onclick="togglePhase(this)"><div class="phase-num">1</div><h4>Receive &amp; review mortgage instructions</h4><span class="phase-tag">Foundation</span><svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+        <div class="phase-body"><ul class="steps">
+          <li>Receive mortgage instructions from lender panel manager; confirm acting for lender and/or borrower</li>
+          <li>Review loan offer and conditions: amount, interest rate, term, special conditions to be met before settlement</li>
+          <li>Verify property title and confirm no defects, caveats, or adverse entries on title search</li>
+          <li>Obtain and review special conditions — valuations, insurance, discharge of existing mortgage</li>
+        </ul></div>
+      </div>
+      <div class="phase-panel sk-terra"><div class="phase-header" onclick="togglePhase(this)"><div class="phase-num">2</div><h4>Prepare &amp; execute mortgage documents</h4><span class="phase-tag">Execution</span><svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+        <div class="phase-body"><ul class="steps">
+          <li>Prepare National Standardised Mortgage Form (NSMF) and Schedule; confirm mortgagor details match CT exactly</li>
+          <li>Prepare direction to pay — confirm payout figures for any existing mortgages being discharged</li>
+          <li>Arrange execution by mortgagor(s); confirm identity of signatories</li>
+          <li>Prepare authority to complete and undertaking for lender; obtain countersignature</li>
+        </ul><div class="doc-strip"><span class="doc-strip-label">📁</span>
+          <a class="doc-pill" href="https://docs.google.com/document/d/1YFCbYwsmpfUw1JfayxGuWzWzjQQkIUeiJVUsYZeLuIQ/edit" target="_blank">(b) Mortgage Form</a>
+          <a class="doc-pill" href="https://docs.google.com/document/d/1AXGZQLXst5iqdDTEX0zxOAMSV_NssLdSo-YSNTx0kQk/edit" target="_blank">(b2) Schedule</a>
+          <a class="doc-pill" href="https://docs.google.com/document/d/1Y7mMiAD_ZnhBWmiTASAwtg18DQLb56S0a1aWUDApzbg/edit" target="_blank">(c) Authority to Complete</a>
+          <a class="doc-pill" href="https://docs.google.com/document/d/13UtLb4c7fnwPVlivx705w9AvenYTkGUxYqyJRfseZJo/edit" target="_blank">(d) Direction to Pay</a>
+        </div></div>
+      </div>
+      <div class="phase-panel sk-terra"><div class="phase-header" onclick="togglePhase(this)"><div class="phase-num">3</div><h4>Settlement &amp; registration</h4><span class="phase-tag">Completion</span><svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+        <div class="phase-body"><ul class="steps">
+          <li>Upload and certify mortgage in PEXA workspace; confirm settlement figures</li>
+          <li>Coordinate with purchaser's solicitor re settlement time and PEXA authorisation</li>
+          <li>Post-settlement: confirm mortgage registered in Land Registry Services; report to lender</li>
+          <li>Issue final invoice; close file</li>
+        </ul></div>
+      </div>
+    </div><!-- /sub-mortgage -->
+
+    <!-- SETTLEMENT DOCS -->
+    <div id="sub-settlement" class="sub-section">
+      <button class="back-btn" onclick="closeSub('conveyance')">← All conveyancing</button>
+      <div class="sub-header"><div class="title">Prepare for Settlement</div><div class="meta">Conveyance · 3. Prepare for Settlement folder</div></div>
+      <div class="doc-grid">
+        <div class="doc-tile"><h4>PEXA Client Authorisation Form</h4><a href="https://docs.google.com/document/d/1NScWZwFw57uQ3lK5aA__rjZdhhUCYQ9Ed1fxxvulYLI/edit" target="_blank" style="color:var(--terracotta)">Open doc →</a></div>
+        <div class="doc-tile"><h4>Reply to Requisitions</h4><a href="https://docs.google.com/document/d/19R2I_mAPiKoWwfc3ui-r4SivC2kikI1UWYypdztpqqY/edit" target="_blank" style="color:var(--terracotta)">Open doc →</a></div>
+        <div class="doc-tile"><h4>Clearance Certificate</h4><a href="https://docs.google.com/document/d/1KHGzFOJ0ae9FSdR4m_VcKPfFvyaaKq5MNC7XnoZhfe8/edit" target="_blank" style="color:var(--terracotta)">Open doc →</a></div>
+        <div class="doc-tile"><h4>OSR s47</h4><a href="https://docs.google.com/document/d/1ON85KUs0HnUfNWo2Dtt0O038cSnKrT59BoOSpu8AHNI/edit" target="_blank" style="color:var(--terracotta)">Open doc →</a></div>
+        <div class="doc-tile"><h4>Vendor's Driver's Licence / Passport</h4><a href="https://docs.google.com/document/d/1O2C3H93ao_MHdHQFtTLhiGUPFrwB-yIFEg3GM4XfL64/edit" target="_blank" style="color:var(--terracotta)">Open doc →</a></div>
+      </div>
+      <div class="section-label">Workflow — settlement checklist</div>
+      <div class="phase-panel sk-terra open"><div class="phase-header" onclick="togglePhase(this)"><div class="phase-num">1</div><h4>Pre-settlement checklist</h4><span class="phase-tag">Preparation</span><svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+        <div class="phase-body"><ul class="steps">
+          <li>Confirm all settlement conditions met: finance formal approval, special conditions satisfied</li>
+          <li>Order final title search 48–72 hrs before settlement — check no new caveats, charges, or dealings lodged</li>
+          <li>Obtain clearance certificate (ATO) confirming no outstanding land tax liability</li>
+          <li>Obtain OSR s47 certificate (land tax clearance for NSW); request from Revenue NSW</li>
+          <li>Confirm vendor has produced acceptable ID (driver's licence + passport or two forms)</li>
+          <li>Verify PEXA workspace: all parties invited, documents signed, settlement time confirmed</li>
+          <li>Confirm adjustments — council rates, water rates, strata levies — and agree settlement figure with other side</li>
+        </ul><div class="doc-strip"><span class="doc-strip-label">📁</span>
+          <a class="doc-pill" href="https://docs.google.com/document/d/1NScWZwFw57uQ3lK5aA__rjZdhhUCYQ9Ed1fxxvulYLI/edit" target="_blank">PEXA Authorisation</a>
+          <a class="doc-pill" href="https://docs.google.com/document/d/1KHGzFOJ0ae9FSdR4m_VcKPfFvyaaKq5MNC7XnoZhfe8/edit" target="_blank">Clearance Certificate</a>
+          <a class="doc-pill" href="https://docs.google.com/document/d/1ON85KUs0HnUfNWo2Dtt0O038cSnKrT59BoOSpu8AHNI/edit" target="_blank">OSR s47</a>
+          <a class="doc-pill" href="https://docs.google.com/document/d/1O2C3H93ao_MHdHQFtTLhiGUPFrwB-yIFEg3GM4XfL64/edit" target="_blank">Vendor ID</a>
+        </div></div>
+      </div>
+    </div><!-- /sub-settlement -->
+  </div>
+</div>
+
+<!-- ─── LITIGATION ──────────────────────────────── -->
+<div id="page-litigation" class="page">
+  <div class="page-header">
+    <div class="breadcrumb">Civil Litigation</div>
+    <h2>Civil <em>litigation</em></h2>
+    <p>Debt recovery · interlocutory applications · trial preparation · enforcement</p>
+  </div>
+  <div class="content">
+    <div id="ov-litigation" class="ac-rose">
+      <div class="overview-grid">
+        <div class="matter-card" onclick="openSub('debt')"><div class="card-eyebrow">Debt Recovery</div><h3>Debt recovery — 6 stages</h3><p>Letter of Demand → Statement of Claim → Defendant Response → Pre-trial → Court Hearing → Deed of Settlement / Enforcement.</p><div class="card-count">6 stage folders → click to explore</div></div>
+        <div class="matter-card" onclick="openSub('gen-lit')"><div class="card-eyebrow">Other correspondence</div><h3>General litigation documents</h3><p>Reply to other party re request for information. Further templates to be added as matters progress.</p><div class="card-count">2 documents</div></div>
+      </div>
+    </div>
+
+    <!-- DEBT -->
+    <div id="sub-debt" class="sub-section">
+      <button class="back-btn" onclick="closeSub('litigation')">← All litigation</button>
+      <div class="sub-header"><div class="title">Debt recovery</div><div class="meta">Civil Litigation · Debt Recovery folder · 6 stages</div></div>
+      <div class="doc-grid">
+        <div class="doc-tile"><h4>[1] Letter of Demand</h4><a href="https://drive.google.com/drive/folders/1zwzlV8GqxkAdMKmdOBrukBEsEkX6EWOP" target="_blank" style="color:var(--dusty-rose)">Folder →</a> &nbsp;<a href="https://docs.google.com/document/d/1VoWHfEEmgf4jTv7ZxsFG6_YQiRmQ9k4Gk0hnbAVoQ_o/edit" target="_blank" style="color:var(--dusty-rose)">Doc →</a></div>
+        <div class="doc-tile"><h4>[2] Statement of Claim</h4><a href="https://drive.google.com/drive/folders/1uh2sc0FZnrulqiuHcNNGW7Ipu0c4bPFJ" target="_blank" style="color:var(--dusty-rose)">Open folder →</a></div>
+        <div class="doc-tile"><h4>[3] Defendant Response</h4><a href="https://drive.google.com/drive/folders/1SMbA6f0SNIcrAbTG79cbmUptg8rSsgC0" target="_blank" style="color:var(--dusty-rose)">Open folder →</a></div>
+        <div class="doc-tile"><h4>[4] Pre-trial</h4><a href="https://drive.google.com/drive/folders/1W9YfnhkprPea6AbxuGB_fH7X3U2tYbxd" target="_blank" style="color:var(--dusty-rose)">Open folder →</a></div>
+        <div class="doc-tile"><h4>[5] Court Hearing</h4><a href="https://drive.google.com/drive/folders/1rFvInA80ci__5Nsym8GkbDM9Vt3aMotF" target="_blank" style="color:var(--dusty-rose)">Open folder →</a></div>
+        <div class="doc-tile"><h4>[6] Deed of Settlement / Enforcement</h4><a href="https://drive.google.com/drive/folders/1sE59SqnKkVJTrg5LWX4VDkwhLmsFUJSy" target="_blank" style="color:var(--dusty-rose)">Folder →</a> &nbsp;<a href="https://drive.google.com/file/d/1auHDM7rO0m2GWVJBtgfqknv42KoETa-_/view" target="_blank" style="color:var(--dusty-rose)">Deed PDF →</a></div>
+      </div>
+      <div class="section-label">Workflow — stage by stage</div>
+      <div class="phase-panel sk-rose open"><div class="phase-header" onclick="togglePhase(this)"><div class="phase-num">1</div><h4>Pre-litigation assessment &amp; letter of demand</h4><span class="phase-tag">Foundation</span><svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+        <div class="phase-body"><ul class="steps">
+          <li>Conflict check; file opening; cost agreement — advise client on costs exposure upfront</li>
+          <li>Assess limitation period — s14 Limitation Act 1969 NSW: 6 years for contract/debt claims from when cause of action accrued</li>
+          <li>Identify cause(s) of action; assess strength of evidence; advise on prospects and ADR alternatives</li>
+          <li>Issue letter of demand with 14–28 days to respond; outline consequences of non-compliance</li>
+        </ul><div class="doc-strip"><span class="doc-strip-label">📁</span>
+          <a class="doc-pill" href="https://docs.google.com/document/d/1VoWHfEEmgf4jTv7ZxsFG6_YQiRmQ9k4Gk0hnbAVoQ_o/edit" target="_blank">Letter of Demand</a>
+          <a class="doc-pill" href="https://docs.google.com/document/d/1YxmhkyXqEF_vY_IEyCYyA10Sr4Lg0Imsh8lY8t00hf0/edit" target="_blank">Procedure notes</a>
+        </div></div>
+      </div>
+      <div class="phase-panel sk-rose"><div class="phase-header" onclick="togglePhase(this)"><div class="phase-num">2</div><h4>Commencing proceedings</h4><span class="phase-tag">Pleadings</span><svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+        <div class="phase-body"><ul class="steps">
+          <li>Select correct court: Local Court (up to $100k), District Court (up to $750k), Supreme Court (unlimited)</li>
+          <li>Draft Statement of Claim — plead each element of the cause of action precisely; avoid embarrassment</li>
+          <li>File and serve — personal service as default; substituted service if required (Form 20 motion + affidavit)</li>
+          <li>Attend first directions hearing — timetable, hearing estimate, case management orders</li>
+        </ul><div class="doc-strip"><span class="doc-strip-label">📁</span>
+          <a class="doc-pill" href="https://drive.google.com/drive/folders/1uh2sc0FZnrulqiuHcNNGW7Ipu0c4bPFJ" target="_blank">[2] SOC folder</a>
+        </div></div>
+      </div>
+      <div class="phase-panel sk-rose"><div class="phase-header" onclick="togglePhase(this)"><div class="phase-num">3</div><h4>Defendant response &amp; interlocutory steps</h4><span class="phase-tag">Defence</span><svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+        <div class="phase-body"><ul class="steps">
+          <li>File Notice of Appearance (defendant); file Defence within time; consider cross-claim</li>
+          <li>Interlocutory applications — injunctions, substituted service, security for costs, discovery</li>
+          <li>Discovery: prepare list of documents; review opponent's; raise objections where privileged</li>
+          <li>Subpoenas to third parties; expert evidence if technical issues in dispute</li>
+          <li>Reply promptly to any requests for information from the other party</li>
+        </ul><div class="doc-strip"><span class="doc-strip-label">📁</span>
+          <a class="doc-pill" href="https://drive.google.com/drive/folders/1SMbA6f0SNIcrAbTG79cbmUptg8rSsgC0" target="_blank">[3] Defendant Response</a>
+          <a class="doc-pill" href="https://docs.google.com/document/d/1PYTyC5PYUAUsrufGuqioKyV3ivGC14KNmUQn7qJSHBY/edit" target="_blank">Reply to other party</a>
+        </div></div>
+      </div>
+      <div class="phase-panel sk-rose"><div class="phase-header" onclick="togglePhase(this)"><div class="phase-num">4</div><h4>Pre-trial preparation</h4><span class="phase-tag">Preparation</span><svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+        <div class="phase-body"><ul class="steps">
+          <li>Prepare court book / tender bundle — paginate and index all documents chronologically</li>
+          <li>Brief counsel if instructing — prepare detailed solicitor's brief with chronology and issues list</li>
+          <li>Prepare opening address outline and closing submissions outline</li>
+          <li>Prepare witness examination (EIC) and cross-examination question outlines</li>
+          <li>Attend any final case management conference or court-ordered mediation</li>
+        </ul><div class="doc-strip"><span class="doc-strip-label">📁</span>
+          <a class="doc-pill" href="https://drive.google.com/drive/folders/1W9YfnhkprPea6AbxuGB_fH7X3U2tYbxd" target="_blank">[4] Pre-trial folder</a>
+        </div></div>
+      </div>
+      <div class="phase-panel sk-rose"><div class="phase-header" onclick="togglePhase(this)"><div class="phase-num">5</div><h4>Court hearing</h4><span class="phase-tag">Hearing</span><svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+        <div class="phase-body"><ul class="steps">
+          <li>Arrive 20 minutes early — confirm all parties present; take final settlement instructions from client</li>
+          <li>State appearance: full name, firm, party you represent — spell your name</li>
+          <li>Open with the order you are seeking; use "I submit…" not "I think…"</li>
+          <li>Bow entering and leaving; remain at bar table until excused; no phone at bar table</li>
+          <li>If you don't know the answer — say so and offer to provide it at recess</li>
+        </ul><div class="doc-strip"><span class="doc-strip-label">📁</span>
+          <a class="doc-pill" href="https://drive.google.com/drive/folders/1rFvInA80ci__5Nsym8GkbDM9Vt3aMotF" target="_blank">[5] Court Hearing folder</a>
+        </div></div>
+      </div>
+      <div class="phase-panel sk-rose"><div class="phase-header" onclick="togglePhase(this)"><div class="phase-num">6</div><h4>Settlement &amp; enforcement</h4><span class="phase-tag">Completion</span><svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+        <div class="phase-body"><ul class="steps">
+          <li>If settled: draft or review Deed of Settlement and Release; obtain execution by all parties</li>
+          <li>If judgment: obtain sealed copy; advise client on appeal options and timeline</li>
+          <li>Enforcement: Writ of Execution, garnishee orders, examination of judgment debtor as to means</li>
+          <li>Costs assessment if costs in dispute; close file; issue final invoice</li>
+        </ul><div class="doc-strip"><span class="doc-strip-label">📁</span>
+          <a class="doc-pill" href="https://drive.google.com/file/d/1auHDM7rO0m2GWVJBtgfqknv42KoETa-_/view" target="_blank">Deed of Settlement PDF</a>
+          <a class="doc-pill" href="https://drive.google.com/drive/folders/1sE59SqnKkVJTrg5LWX4VDkwhLmsFUJSy" target="_blank">[6] Enforcement folder</a>
+        </div></div>
+      </div>
+    </div><!-- /sub-debt -->
+
+    <!-- GEN LIT -->
+    <div id="sub-gen-lit" class="sub-section">
+      <button class="back-btn" onclick="closeSub('litigation')">← All litigation</button>
+      <div class="sub-header"><div class="title">General litigation documents</div><div class="meta">Civil Litigation · Other correspondence</div></div>
+      <div class="doc-grid">
+        <div class="doc-tile"><h4>Reply to other party — request for information</h4><a href="https://docs.google.com/document/d/1PYTyC5PYUAUsrufGuqioKyV3ivGC14KNmUQn7qJSHBY/edit" target="_blank" style="color:var(--dusty-rose)">Open doc →</a></div>
+        <div class="doc-tile"><h4>Procedure notes</h4><a href="https://docs.google.com/document/d/1YxmhkyXqEF_vY_IEyCYyA10Sr4Lg0Imsh8lY8t00hf0/edit" target="_blank" style="color:var(--dusty-rose)">Open doc →</a></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── CAREER ──────────────────────────────────── -->
+<div id="page-career" class="page">
+  <div class="page-header">
+    <div class="breadcrumb">Career Notes</div>
+    <h2>Soft skills <em>&amp; craft</em></h2>
+    <p>From your Notion PLT notes — client interviewing, writing, advocacy, ethics, and professional growth</p>
+  </div>
+  <div class="content">
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="setTab('interviewing', this)">Client interviewing</button>
+      <button class="tab-btn" onclick="setTab('writing', this)">Legal writing</button>
+      <button class="tab-btn" onclick="setTab('advocacy', this)">Advocacy &amp; court</button>
+      <button class="tab-btn" onclick="setTab('ethics', this)">Ethics &amp; risk</button>
+      <button class="tab-btn" onclick="setTab('professional', this)">Professional growth</button>
+    </div>
+
+    <div id="tab-interviewing" class="tab-panel active">
+      <div class="note-card"><h4>Before the meeting <span class="note-tag" style="background:var(--sage-pale);color:var(--sage)">Prep</span></h4><ul class="note-items">
+        <li>Always run a conflict check before accepting — confirm no existing client on the other side</li>
+        <li>Do your homework — familiarise yourself with the client's background before they arrive</li>
+        <li>Assess risk level: high-risk or low-risk? Consider due diligence searches</li>
+        <li>Assess sophistication — adjust communication depth accordingly</li>
+        <li>Meet in person for the first meeting if possible — pick up on the client's vibe; match their energy</li>
+      </ul></div>
+      <div class="note-card"><h4>Greeting &amp; opening <span class="note-tag" style="background:var(--sage-pale);color:var(--sage)">First impression</span></h4><ul class="note-items">
+        <li>Always meet clients in the conference room — not your desk (confidentiality)</li>
+        <li>Introduce yourself with first and last name, always</li>
+        <li>Start with small talk; transition efficiently to the matter at hand</li>
+        <li>Observe how senior associates dress and interact — mirror that until you find your own style</li>
+        <li>Be transparent about fees at the outset — how the firm charges and for what</li>
+        <li>Never give legal advice in the first meeting until you have reviewed all documents</li>
+      </ul></div>
+      <div class="note-card"><h4>During the interview <span class="note-tag" style="background:var(--slate-pale);color:var(--slate)">Questioning</span></h4><ul class="note-items">
+        <li>Use open questions for context; closed questions for drilling down on specific facts</li>
+        <li>Avoid double-barrelled questions — ask one thing at a time</li>
+        <li>When asking potentially sensitive questions, explain why you need that information first</li>
+        <li>Stay objective — don't believe everything the client says; verify against documents</li>
+        <li>Don't ask "do you have any questions?" — ask "do you have any concerns about [specific issue]?"</li>
+        <li>Never let the client leave without knowing exactly what happens next</li>
+      </ul></div>
+      <div class="callout">Communication problems account for up to 40% of claims against lawyers. This is a service industry.</div>
+      <div class="note-card"><h4>File notes <span class="note-tag" style="background:var(--terra-pale);color:var(--terracotta)">Documentation</span></h4><ul class="note-items">
+        <li>Capture: Who, When, What, Why, How — including related parties and apparently irrelevant detail</li>
+        <li>Record the client's exact words — for future affidavit drafting, use their phrasing</li>
+        <li>Note key dates — court dates, document deadlines, next steps agreed</li>
+        <li>Structure chronologically with headings — make it easy to brief a senior quickly</li>
+        <li>For high-risk clients: always follow up in writing after the meeting</li>
+      </ul></div>
+    </div>
+
+    <div id="tab-writing" class="tab-panel">
+      <div class="note-card"><h4>Writing for clients <span class="note-tag" style="background:var(--sage-pale);color:var(--sage)">Plain language</span></h4><ul class="note-items">
+        <li>Write so the client can understand — plain language, clear and concise</li>
+        <li>Always tell the client WHAT to do and WHEN</li>
+        <li>Always reference their instructions: "You have instructed me that…"</li>
+        <li>If the client needs to sign: bring them in and explain — don't just post documents cold</li>
+        <li>If posting: print three copies; mark every signature and initials point clearly</li>
+      </ul></div>
+      <div class="note-card"><h4>Writing for the court &amp; other lawyers <span class="note-tag" style="background:var(--slate-pale);color:var(--slate)">Formal</span></h4><ul class="note-items">
+        <li>Writing is your reputation — treat every document as a reflection of your professional standing</li>
+        <li>Never include your name as contact unless comfortable with it being shown in court</li>
+        <li>Always include GST in any cost figures</li>
+        <li>Align and format documents properly — sloppy formatting undermines credibility</li>
+      </ul></div>
+      <div class="note-card"><h4>Email conventions <span class="note-tag" style="background:var(--terra-pale);color:var(--terracotta)">Correspondence</span></h4><ul class="note-items">
+        <li>Study your senior associate's email style — adopt their structure and tone</li>
+        <li>One issue = one paragraph</li>
+        <li>High-risk clients: write advice as a letter and attach — not in the email body</li>
+        <li>Hard copy letter: "Enclosed". Word document: "Attached"</li>
+        <li>CC order: most relevant to the matter first</li>
+        <li>Do not get personally invested — control your tone; keep client emotions out of correspondence</li>
+      </ul></div>
+      <div class="note-card"><h4>Standard letter phrases <span class="note-tag" style="background:var(--mauve-pale);color:var(--mauve)">Templates</span></h4><ul class="note-items">
+        <li>"We act for…"</li><li>"We are instructed that…"</li>
+        <li>"We have instructions to…"</li><li>"We trust the matter can be resolved amicably…"</li>
+      </ul>
+      <div class="callout">Recommended reading: <em>Point Made</em> — consistently praised by practitioners for good legal writing.</div></div>
+    </div>
+
+    <div id="tab-advocacy" class="tab-panel">
+      <div class="note-card"><h4>Court basics <span class="note-tag" style="background:var(--slate-pale);color:var(--slate)">Protocol</span></h4><ul class="note-items">
+        <li>Arrive 20 minutes before listing — confirm all parties; take final settlement instructions</li>
+        <li>Bow entering and leaving the courtroom; no phone; do not react to what is said in court</li>
+        <li>State appearance: "Your Honour, I appear for the plaintiff. My name is [full name]." — spell your name</li>
+        <li>Remain at bar table until excused; remain silent when an oath is taken</li>
+        <li>Address the judge as "Your Honour"; address the Registrar directly</li>
+      </ul></div>
+      <div class="note-card"><h4>Submissions <span class="note-tag" style="background:var(--sage-pale);color:var(--sage)">Advocacy</span></h4><ul class="note-items">
+        <li>Open with the order you are seeking and what you want the court to do</li>
+        <li>Use court language: "I submit…" not "I think…"</li>
+        <li>Refer to solicitors as "my friend"; barristers as "my learned friend"</li>
+        <li>Close: "Those are my submissions unless there is anything else I can assist Your Honour with"</li>
+        <li>Never mislead a judge or jury — your role is to help find the truth</li>
+        <li>If you don't know: "I don't know but I will find out at recess, Your Honour"</li>
+      </ul></div>
+      <div class="callout">Preparation is almost everything. Knowing your client and the facts cold fills in a lot of the "still learning" gaps.</div>
+      <div class="note-card"><h4>What a "mention" is <span class="note-tag" style="background:var(--terra-pale);color:var(--terracotta)">Listing types</span></h4><ul class="note-items">
+        <li>A brief administrative hearing to update the court on the status of proceedings</li>
+        <li>Be ready: what has been done since last time, and what does the court need to order next?</li>
+        <li>Common outputs: evidence timetable, referral to mediation, hearing date fixed</li>
+      </ul></div>
+    </div>
+
+    <div id="tab-ethics" class="tab-panel">
+      <div class="note-card"><h4>Core ethical duties <span class="note-tag" style="background:var(--rose-pale);color:var(--dusty-rose)">Conduct</span></h4><ul class="note-items">
+        <li>Be rules-based — follow the conduct rules in real life, not just in theory</li>
+        <li>Duty to disclose to the court — remain honest; your career and your firm depend on it</li>
+        <li>If client instructs against your advice: document everything — you don't own their problem</li>
+        <li>If the relationship needs to end: let them terminate you, not the other way around</li>
+        <li>Never waive your bill — client must pay before file transferred to another solicitor</li>
+      </ul></div>
+      <div class="note-card"><h4>Managing client risk <span class="note-tag" style="background:var(--sage-pale);color:var(--sage)">Risk management</span></h4><ul class="note-items">
+        <li>Google the client before the first meeting — always</li>
+        <li>Distinguish high-risk from low-risk early — conduct searches, assess patterns</li>
+        <li>Always confirm important advice in writing — if no documentation, you never gave that advice</li>
+        <li>Know who has power in your firm — equity partners own the firm</li>
+      </ul></div>
+      <div class="note-card"><h4>Billing awareness <span class="note-tag" style="background:var(--slate-pale);color:var(--slate)">Firm structure</span></h4><ul class="note-items">
+        <li>Equity partner — do not underestimate them; they own the firm</li>
+        <li>Salaried partner — approx. $1,000–1,200/hr</li>
+        <li>Special counsel / Senior associate — approx. $600/hr</li>
+        <li>Associate — $400–500/hr · Solicitor — $300–400/hr · Paralegal — approx. $200/hr</li>
+        <li>Record time accurately — know whether your firm charges hourly or flat rate</li>
+      </ul></div>
+    </div>
+
+    <div id="tab-professional" class="tab-panel">
+      <div class="note-card"><h4>Mindset <span class="note-tag" style="background:var(--mauve-pale);color:var(--mauve)">Attitude</span></h4><ul class="note-items">
+        <li>Mentorship is worth its weight in gold — find a mentor inside or outside the firm</li>
+        <li>Preparation is almost everything — know your client and facts cold</li>
+        <li>Attitude is everything else — take mistakes with grace; they don't define you</li>
+        <li>Be excellent and irreplaceable in your area of interest — don't try to be mediocre everywhere</li>
+        <li>Be responsive — reply promptly, even just to say you're looking into it</li>
+      </ul></div>
+      <div class="note-card"><h4>Managing up <span class="note-tag" style="background:var(--sage-pale);color:var(--sage)">Working with seniors</span></h4><ul class="note-items">
+        <li>Observe senior associates and partners — watch how they dress, write, speak, and handle clients</li>
+        <li>Find someone you want to be in 5–10 years — ask them for coffee</li>
+        <li>Brief your senior clearly and concisely from the file note — make it easy to get across the matter fast</li>
+        <li>Seek help when needed — never bluff or guess on important matters</li>
+      </ul></div>
+      <div class="note-card"><h4>Craft the market values <span class="note-tag" style="background:var(--slate-pale);color:var(--slate)">Skills</span></h4><ul class="note-items">
+        <li>Attention to detail — the most important skill; errors have real consequences for real people</li>
+        <li>Humility inside, confidence outside — know what you don't know; project assurance to clients</li>
+        <li>Curiosity — ask why, not just what; understand the law behind the rule</li>
+        <li>Self-discipline — no one will chase you; own your deadlines</li>
+        <li>Adaptability — every client, every matter, every supervisor is different</li>
+        <li>Cross-cultural awareness — adjust communication style to the person in front of you</li>
+      </ul></div>
+      <div class="callout">Every young lawyer makes mistakes. Taking them with grace — "Thank you for explaining, Your Honour. May we have a brief recess?" — makes all the difference.</div>
+    </div>
+  </div>
+</div>
+
+</main>
+</div><!-- /shell -->
+
+<script>
+/* ── NAVIGATION ─────────────────────────────────────── */
+function nav(el) {
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  document.querySelectorAll('.sub-section').forEach(s => s.classList.remove('open'));
+  document.querySelectorAll('[id^="ov-"]').forEach(o => o.style.display = '');
+  const ov = document.querySelector('#page-' + id + ' [id^="ov-"]');
+  if (ov) ov.style.display = '';
+  if (isEditMode) applyEditMode();
+}
+
+function openSub(type) {
+  document.querySelectorAll('.sub-section').forEach(s => s.classList.remove('open'));
+  const el = document.getElementById('sub-' + type);
+  if (el) el.classList.add('open');
+  const ap = document.querySelector('.page.active');
+  if (ap) ap.querySelectorAll('[id^="ov-"]').forEach(o => o.style.display = 'none');
+  if (isEditMode) applyEditMode();
+}
+
+function closeSub(pageId) {
+  document.querySelectorAll('.sub-section').forEach(s => s.classList.remove('open'));
+  const ap = document.getElementById('page-' + pageId);
+  if (ap) ap.querySelectorAll('[id^="ov-"]').forEach(o => o.style.display = '');
+  if (isEditMode) applyEditMode();
+}
+
+function togglePhase(header) {
+  header.closest('.phase-panel').classList.toggle('open');
+}
+
+function setTab(id, btn) {
+  document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+/* ── EDIT MODE ───────────────────────────────────────── */
+let isEditMode = false;
+
+// Elements made editable — selector list
+const EDITABLE = [
+  '.steps li',
+  '.note-items li',
+  '.phase-header h4',
+  '.note-card h4',
+  '.sub-header .title',
+  '.callout',
+  '.card-eyebrow',
+  '.matter-card h3',
+  '.matter-card p',
+  '.note-text',
+  '.page-header h2',
+  '.page-header p',
+  '.dash-card h3',
+];
+
+function applyEditMode() {
+  EDITABLE.forEach(sel => {
+    document.querySelectorAll(sel).forEach(el => {
+      el.setAttribute('contenteditable', 'true');
+      el.setAttribute('spellcheck', 'true');
+    });
+  });
+}
+
+function removeEditMode() {
+  document.querySelectorAll('[contenteditable]').forEach(el => {
+    el.removeAttribute('contenteditable');
+    el.removeAttribute('spellcheck');
+  });
+}
+
+function toggleEditMode() {
+  isEditMode = !isEditMode;
+  const btnEdit = document.getElementById('btn-edit');
+  const btnSave = document.getElementById('btn-save');
+  const btnDiscard = document.getElementById('btn-discard');
+
+  if (isEditMode) {
+    document.body.classList.add('edit-mode');
+    applyEditMode();
+    btnEdit.textContent = '✏ Editing…';
+    btnEdit.classList.add('active');
+    btnSave.style.display = 'flex';
+    btnDiscard.style.display = 'flex';
+    showToast('Edit mode on — click any text to edit', 'info', 2500);
+  } else {
+    document.body.classList.remove('edit-mode');
+    removeEditMode();
+    btnEdit.textContent = '✏ Edit';
+    btnEdit.classList.remove('active');
+    btnSave.style.display = 'none';
+    btnDiscard.style.display = 'none';
+  }
+}
+
+function discardEdits() {
+  if (!confirm('Discard all unsaved edits and reload the page?')) return;
+  window.location.reload();
+}
+
+/* ── GITHUB SAVE ─────────────────────────────────────── */
+const GH_KEY = 'gh_config_lw';
+
+function loadGitHubConfig() {
+  try { return JSON.parse(localStorage.getItem(GH_KEY)) || null; }
+  catch { return null; }
+}
+
+function openModal() {
+  const cfg = loadGitHubConfig();
+  if (cfg) {
+    document.getElementById('gh-user').value  = cfg.user  || '';
+    document.getElementById('gh-repo').value  = cfg.repo  || '';
+    document.getElementById('gh-token').value = cfg.token || '';
+  }
+  document.getElementById('gh-modal-overlay').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('gh-modal-overlay').classList.remove('open');
+  document.getElementById('gh-error').style.display = 'none';
+}
+
+function saveGitHubConfig() {
+  const user  = document.getElementById('gh-user').value.trim();
+  const repo  = document.getElementById('gh-repo').value.trim();
+  const token = document.getElementById('gh-token').value.trim();
+  const errEl = document.getElementById('gh-error');
+
+  if (!user || !repo || !token) {
+    errEl.textContent = 'All three fields are required.';
+    errEl.style.display = 'block';
+    return;
+  }
+  localStorage.setItem(GH_KEY, JSON.stringify({ user, repo, token }));
+  closeModal();
+  showToast('GitHub connected — saving now…', 'info', 2000);
+  setTimeout(pushToGitHub, 400);
+}
+
+async function saveToGitHub() {
+  const cfg = loadGitHubConfig();
+  if (!cfg) { openModal(); return; }
+  await pushToGitHub();
+}
+
+function resetSaveBtn() {
+  const btnSave = document.getElementById('btn-save');
+  if (btnSave) {
+    btnSave.textContent = '↑ Save to GitHub';
+    btnSave.classList.remove('saving');
+    btnSave.style.pointerEvents = '';
+  }
+}
+
+async function pushToGitHub() {
+  const cfg = loadGitHubConfig();
+  if (!cfg) { openModal(); return; }
+
+  const btnSave = document.getElementById('btn-save');
+  btnSave.textContent = '↑ Saving…';
+  btnSave.classList.add('saving');
+
+  // Hard timeout — always reset button after 15s no matter what
+  const hardReset = setTimeout(resetSaveBtn, 15000);
+
+  try {
+    // 1. Temporarily remove contenteditable so saved HTML is clean
+    removeEditMode();
+
+    // 2. Serialise the full page HTML
+    const html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+
+    // 3. Re-apply edit mode
+    applyEditMode();
+
+    // 4. Get current file SHA
+    const apiBase = `https://api.github.com/repos/${cfg.user}/${cfg.repo}/contents/index.html`;
+    const headers = {
+      'Authorization': `token ${cfg.token}`,
+      'Accept': 'application/vnd.github.v3+json',
+      'Content-Type': 'application/json',
+    };
+
+    const shaRes = await fetch(apiBase, { headers });
+    if (!shaRes.ok) {
+      if (shaRes.status === 401) throw new Error('Token invalid — click ⚙ to update your token.');
+      if (shaRes.status === 403) throw new Error('Token lacks repo scope — click ⚙ to update.');
+      if (shaRes.status === 404) throw new Error('Repo or file not found — click ⚙ to check username/repo.');
+      throw new Error(`GitHub error ${shaRes.status} — click ⚙ to reconfigure.`);
+    }
+    const { sha } = await shaRes.json();
+
+    // 5. Push updated file
+    const body = {
+      message: `Update legal workflow — ${new Date().toLocaleString('en-AU', { timeZone: 'Australia/Sydney' })}`,
+      content: btoa(unescape(encodeURIComponent(html))),
+      sha,
+    };
+    const pushRes = await fetch(apiBase, { method: 'PUT', headers, body: JSON.stringify(body) });
+    if (!pushRes.ok) {
+      const detail = await pushRes.json().catch(() => ({}));
+      throw new Error(detail.message || `Push failed (${pushRes.status})`);
+    }
+
+    showToast('✓ Saved to GitHub — live in ~30s', 'success', 3500);
+
+  } catch (err) {
+    console.error(err);
+    showToast('✗ ' + err.message, 'error', 6000);
+  } finally {
+    clearTimeout(hardReset);
+    resetSaveBtn();
+  }
+}
+
+/* Reconfigure GitHub settings */
+function reconfigGitHub() { openModal(); }
+
+/* ── TOAST ───────────────────────────────────────────── */
+let toastTimer;
+function showToast(msg, type = 'info', duration = 3000) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'show ' + type;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { t.className = ''; }, duration);
+}
+
+/* ── AUTO-RESET on load — clears any stuck save state ── */
+window.addEventListener('load', () => {
+  resetSaveBtn();
+  // settings button is always visible and clickable
+  const s = document.getElementById('btn-settings');
+  if (s) s.style.display = 'flex';
+});
+
+/* ── KEYBOARD SHORTCUT ───────────────────────────────── */
+// Cmd/Ctrl + E = toggle edit mode
+// Cmd/Ctrl + S = save (when in edit mode)
+document.addEventListener('keydown', e => {
+  const mod = e.metaKey || e.ctrlKey;
+  if (mod && e.key === 'e') { e.preventDefault(); toggleEditMode(); }
+  if (mod && e.key === 's' && isEditMode) { e.preventDefault(); saveToGitHub(); }
+});
+
+/* GitHub settings accessible via ⚙ button */
+
+</script>
+
+<!-- ── EDIT MODE UI ─────────────────────────────────── -->
+<div id="edit-banner">✏ Edit mode active — click any text to edit</div>
+
+<div id="edit-toolbar">
+  <button class="toolbar-btn" id="btn-discard" onclick="discardEdits()">✕ Discard</button>
+  <button class="toolbar-btn" id="btn-save" onclick="saveToGitHub()">↑ Save to GitHub</button>
+  <button class="toolbar-btn" id="btn-settings" onclick="openModal()" title="GitHub settings">⚙</button>
+  <button class="toolbar-btn" id="btn-edit" onclick="toggleEditMode()">✏ Edit</button>
+</div>
+
+<div id="gh-modal-overlay">
+  <div id="gh-modal">
+    <h3>Connect to GitHub</h3>
+    <p>Enter your GitHub details once — they'll be stored in your browser. Your token needs <strong>repo</strong> scope.<br>
+    <a href="https://github.com/settings/tokens/new?scopes=repo&description=LegalWorkflow" target="_blank">Click here to generate a token →</a></p>
+    <div class="modal-field">
+      <label class="modal-label">GitHub username</label>
+      <input class="modal-input" id="gh-user" placeholder="e.g. emilylaw" autocomplete="off">
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">Repository name</label>
+      <input class="modal-input" id="gh-repo" placeholder="e.g. legal-workflow" autocomplete="off">
+      <div class="modal-hint">The repo where your index.html lives</div>
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">Personal Access Token</label>
+      <input class="modal-input" id="gh-token" type="password" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off">
+      <div class="modal-hint">Stored locally in your browser only — never sent anywhere except GitHub's API</div>
+    </div>
+    <div id="gh-error"></div>
+    <div class="modal-actions">
+      <button class="modal-btn secondary" onclick="closeModal()">Cancel</button>
+      <button class="modal-btn primary" onclick="saveGitHubConfig()">Save &amp; connect</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+</body>
+</html>
